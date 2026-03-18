@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneWave AI — Neural Cosmos</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{overflow:hidden;background:#000;font-family:'Inter',-apple-system,sans-serif;cursor:crosshair;color:#fff}
+canvas{display:block}
+#overlay{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:10}
+#logo{position:fixed;top:36px;left:40px;z-index:20;display:flex;align-items:center;gap:14px;opacity:0;animation:fadeIn 1.5s ease .5s forwards}
+#logo svg{width:38px;height:38px}
+#logo span{font-size:20px;font-weight:600;letter-spacing:-.3px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,.7) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#center-text{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:20;pointer-events:none;opacity:0;animation:fadeIn 2s ease 1s forwards}
+#center-text h1{font-size:clamp(32px,6vw,72px);font-weight:700;letter-spacing:-2px;line-height:1.1;background:linear-gradient(135deg,#fff 0%,#a78bfa 50%,#6366f1 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+#center-text p{font-size:clamp(14px,2vw,18px);font-weight:300;color:rgba(255,255,255,.5);letter-spacing:3px;text-transform:uppercase}
+#stats{position:fixed;bottom:36px;left:40px;z-index:20;display:flex;gap:40px;opacity:0;animation:fadeIn 1.5s ease 1.5s forwards}
+.stat{display:flex;flex-direction:column;gap:4px}
+.stat-value{font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{font-size:11px;font-weight:400;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase}
+#controls{position:fixed;bottom:36px;right:40px;z-index:20;display:flex;gap:10px;opacity:0;animation:fadeIn 1.5s ease 2s forwards}
+.ctrl-btn{padding:10px 20px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);color:rgba(255,255,255,.7);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;letter-spacing:.5px;border-radius:100px;cursor:pointer;pointer-events:all;transition:all .3s ease}
+.ctrl-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(167,139,250,.4);color:#fff}
+.ctrl-btn.active{background:rgba(99,102,241,.2);border-color:rgba(99,102,241,.5);color:#a78bfa}
+#hint{position:fixed;top:36px;right:40px;z-index:20;font-size:12px;color:rgba(255,255,255,.3);opacity:0;animation:fadeIn 1.5s ease 2.5s forwards,fadeOut 2s ease 8s forwards}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes fadeOut{to{opacity:0}}
+#overlay::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.6) 100%)}
+</style>
+</head>
+<body>
+<div id="overlay"></div>
+<div id="logo"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g1" x1="0" y1="0" x2="40" y2="40"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#6366f1"/></linearGradient></defs><circle cx="20" cy="20" r="18" stroke="url(#g1)" stroke-width="2.5" fill="none"/><path d="M12 24 C12 24,16 12,20 18 C24 24,28 14,28 14" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg><span>OneWave AI</span></div>
+<div id="center-text"><h1>Neural Cosmos</h1><p>Move your cursor to explore</p></div>
+<div id="stats"><div class="stat"><span class="stat-value" id="nodeCount">0</span><span class="stat-label">Nodes</span></div><div class="stat"><span class="stat-value" id="connectionCount">0</span><span class="stat-label">Connections</span></div><div class="stat"><span class="stat-value" id="fpsCount">60</span><span class="stat-label">FPS</span></div></div>
+<div id="controls"><button class="ctrl-btn active" onclick="setMode('galaxy')">Galaxy</button><button class="ctrl-btn" onclick="setMode('helix')">DNA Helix</button><button class="ctrl-btn" onclick="setMode('sphere')">Sphere</button><button class="ctrl-btn" onclick="setMode('wave')">Wave</button><button class="ctrl-btn" onclick="togglePulse(this)">Pulse</button></div>
+<div id="hint">Click &amp; drag to orbit • Scroll to zoom</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const PARTICLE_COUNT=4000,CONNECTION_DISTANCE=2.2,MOUSE_INFLUENCE=3,PALETTE=[new THREE.Color(0xa78bfa),new THREE.Color(0x6366f1),new THREE.Color(0x818cf8),new THREE.Color(0xc4b5fd),new THREE.Color(0x4f46e5),new THREE.Color(0x7c3aed)];
+const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0,.035);
+const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,1e3);camera.position.set(0,2,18);
+const renderer=new THREE.WebGLRenderer({antialias:!0,alpha:!0});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(0);document.body.insertBefore(renderer.domElement,document.body.firstChild);
+const mouse=new THREE.Vector2(0,0),mouse3D=new THREE.Vector3(0,0,0);let isDragging=!1,prevMouse={x:0,y:0},orbitAngle={x:0,y:0},targetOrbit={x:0,y:0},zoomLevel=18,targetZoom=18;
+addEventListener("mousemove",e=>{mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;mouse3D.set(mouse.x*8,mouse.y*5,0);isDragging&&(targetOrbit.x+=(e.clientX-prevMouse.x)*.005,targetOrbit.y+=(e.clientY-prevMouse.y)*.003,targetOrbit.y=Math.max(-1.2,Math.min(1.2,targetOrbit.y)));prevMouse={x:e.clientX,y:e.clientY}});
+addEventListener("mousedown",e=>{isDragging=!0;prevMouse={x:e.clientX,y:e.clientY}});addEventListener("mouseup",()=>isDragging=!1);
+addEventListener("wheel",e=>{targetZoom+=e.deltaY*.01;targetZoom=Math.max(6,Math.min(35,targetZoom))});
+addEventListener("touchmove",e=>{const t=e.touches[0];mouse.x=t.clientX/innerWidth*2-1;mouse.y=-(t.clientY/innerHeight)*2+1;mouse3D.set(mouse.x*8,mouse.y*5,0)},{passive:!0});
+const geometry=new THREE.BufferGeometry,positions=new Float32Array(PARTICLE_COUNT*3),colors=new Float32Array(PARTICLE_COUNT*3),sizes=new Float32Array(PARTICLE_COUNT),targetPositions=new Float32Array(PARTICLE_COUNT*3),velocities=new Float32Array(PARTICLE_COUNT*3),originalPositions=new Float32Array(PARTICLE_COUNT*3);
+for(let i=0;i<PARTICLE_COUNT;i++){const i3=i*3,angle=i/PARTICLE_COUNT*Math.PI*12,radius=Math.sqrt(i/PARTICLE_COUNT)*10,armOffset=i%3/3*Math.PI*2,jitter=(Math.random()-.5)*1.5;positions[i3]=Math.cos(angle+armOffset)*radius+jitter;positions[i3+1]=(Math.random()-.5)*1.5;positions[i3+2]=Math.sin(angle+armOffset)*radius+jitter;originalPositions[i3]=positions[i3];originalPositions[i3+1]=positions[i3+1];originalPositions[i3+2]=positions[i3+2];targetPositions[i3]=positions[i3];targetPositions[i3+1]=positions[i3+1];targetPositions[i3+2]=positions[i3+2];const color=PALETTE[Math.floor(Math.random()*PALETTE.length)];colors[i3]=color.r;colors[i3+1]=color.g;colors[i3+2]=color.b;sizes[i]=Math.random()*3+1;velocities[i3]=0;velocities[i3+1]=0;velocities[i3+2]=0}
+geometry.setAttribute("position",new THREE.BufferAttribute(positions,3));geometry.setAttribute("color",new THREE.BufferAttribute(colors,3));geometry.setAttribute("size",new THREE.BufferAttribute(sizes,1));
+const particleMaterial=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uPixelRatio:{value:renderer.getPixelRatio()},uMouse:{value:new THREE.Vector3},uPulse:{value:0}},vertexShader:"attribute float size;attribute vec3 color;varying vec3 vColor;varying float vDist;uniform float uTime;uniform float uPixelRatio;uniform vec3 uMouse;uniform float uPulse;void main(){vColor=color;vec3 pos=position;float dist=distance(pos.xy,uMouse.xy);float influence=smoothstep(4.0,0.0,dist);pos.z+=influence*2.0;if(uPulse>0.0){float pulseDist=length(pos);float pulseWave=sin(pulseDist*1.5-uTime*3.0)*uPulse;pos+=normalize(pos)*pulseWave*0.5;}vec4 mvPosition=modelViewMatrix*vec4(pos,1.0);vDist=-mvPosition.z;float dynamicSize=size*(1.0+influence*2.0);dynamicSize*=(1.0+sin(uTime*2.0+float(gl_VertexID)*0.1)*0.15);gl_PointSize=dynamicSize*uPixelRatio*(200.0/-mvPosition.z);gl_PointSize=max(gl_PointSize,1.0);gl_Position=projectionMatrix*mvPosition;}",fragmentShader:"varying vec3 vColor;varying float vDist;void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;float alpha=1.0-smoothstep(0.0,0.5,d);alpha*=alpha;float distFade=smoothstep(40.0,5.0,vDist);vec3 glow=vColor*(1.0+(1.0-d*2.0)*0.5);gl_FragColor=vec4(glow,alpha*distFade*0.9);}",transparent:!0,blending:THREE.AdditiveBlending,depthWrite:!1});
+const particles=new THREE.Points(geometry,particleMaterial);scene.add(particles);
+const MAX_CONNECTIONS=3e3,linePositions=new Float32Array(MAX_CONNECTIONS*6),lineColors=new Float32Array(MAX_CONNECTIONS*6),lineGeometry=new THREE.BufferGeometry;lineGeometry.setAttribute("position",new THREE.BufferAttribute(linePositions,3));lineGeometry.setAttribute("color",new THREE.BufferAttribute(lineColors,3));
+const lineMaterial=new THREE.LineBasicMaterial({vertexColors:!0,transparent:!0,opacity:.15,blending:THREE.AdditiveBlending,depthWrite:!1});const lines=new THREE.LineSegments(lineGeometry,lineMaterial);scene.add(lines);
+const bgCount=2e3,bgGeo=new THREE.BufferGeometry,bgPos=new Float32Array(bgCount*3);for(let i=0;i<bgCount*3;i++)bgPos[i]=(Math.random()-.5)*80;bgGeo.setAttribute("position",new THREE.BufferAttribute(bgPos,3));const bgMat=new THREE.PointsMaterial({size:.08,color:0x444466,transparent:!0,opacity:.6,blending:THREE.AdditiveBlending});const bgStars=new THREE.Points(bgGeo,bgMat);scene.add(bgStars);
+let currentMode="galaxy",pulseActive=!1,morphProgress=0,isMorphing=!1;
+function generateGalaxy(i){const angle=i/PARTICLE_COUNT*Math.PI*12,radius=Math.sqrt(i/PARTICLE_COUNT)*10,armOffset=i%3/3*Math.PI*2,jitter=(Math.random()-.5)*1.2;return[Math.cos(angle+armOffset)*radius+jitter,(Math.random()-.5)*1.2,Math.sin(angle+armOffset)*radius+jitter]}
+function generateHelix(i){const t=i/PARTICLE_COUNT*Math.PI*8,strand=i%2,radius=3,offset=strand*Math.PI,jitter=(Math.random()-.5)*.4;return[Math.cos(t+offset)*radius+jitter,(i/PARTICLE_COUNT-.5)*18+jitter,Math.sin(t+offset)*radius+jitter]}
+function generateSphere(i){const phi=Math.acos(1-2*(i/PARTICLE_COUNT)),theta=Math.PI*(1+Math.sqrt(5))*i,radius=6+(Math.random()-.5)*1.5;return[Math.sin(phi)*Math.cos(theta)*radius,Math.sin(phi)*Math.sin(theta)*radius,Math.cos(phi)*radius]}
+function generateWave(i){const cols=Math.ceil(Math.sqrt(PARTICLE_COUNT)),x=i%cols/cols,z=Math.floor(i/cols)/cols;return[(x-.5)*20,0,(z-.5)*20]}
+const generators={galaxy:generateGalaxy,helix:generateHelix,sphere:generateSphere,wave:generateWave};
+function setMode(mode){currentMode=mode;isMorphing=!0;morphProgress=0;document.querySelectorAll(".ctrl-btn").forEach(btn=>{btn.classList.toggle("active",btn.textContent.toLowerCase()===mode)});for(let i=0;i<PARTICLE_COUNT;i++){const pos=generators[mode](i);targetPositions[i*3]=pos[0];targetPositions[i*3+1]=pos[1];targetPositions[i*3+2]=pos[2]}}
+function togglePulse(btn){pulseActive=!pulseActive;btn.classList.toggle("active",pulseActive)}window.setMode=setMode;window.togglePulse=togglePulse;
+const clock=new THREE.Clock;let frameCount=0,lastFpsTime=0;
+function updateConnections(){let connectionIdx=0;const pos=geometry.attributes.position.array,col=geometry.attributes.color.array,step=Math.max(1,Math.floor(PARTICLE_COUNT/400));for(let i=0;i<PARTICLE_COUNT&&connectionIdx<MAX_CONNECTIONS;i+=step)for(let j=i+step;j<PARTICLE_COUNT&&connectionIdx<MAX_CONNECTIONS;j+=step){const dx=pos[i*3]-pos[j*3],dy=pos[i*3+1]-pos[j*3+1],dz=pos[i*3+2]-pos[j*3+2],dist=Math.sqrt(dx*dx+dy*dy+dz*dz);if(dist<CONNECTION_DISTANCE){const alpha=1-dist/CONNECTION_DISTANCE,ci=connectionIdx*6;linePositions[ci]=pos[i*3];linePositions[ci+1]=pos[i*3+1];linePositions[ci+2]=pos[i*3+2];linePositions[ci+3]=pos[j*3];linePositions[ci+4]=pos[j*3+1];linePositions[ci+5]=pos[j*3+2];lineColors[ci]=col[i*3]*alpha;lineColors[ci+1]=col[i*3+1]*alpha;lineColors[ci+2]=col[i*3+2]*alpha;lineColors[ci+3]=col[j*3]*alpha;lineColors[ci+4]=col[j*3+1]*alpha;lineColors[ci+5]=col[j*3+2]*alpha;connectionIdx++}}for(let i=connectionIdx*6;i<MAX_CONNECTIONS*6;i++){linePositions[i]=0;lineColors[i]=0}lineGeometry.attributes.position.needsUpdate=!0;lineGeometry.attributes.color.needsUpdate=!0;lineGeometry.setDrawRange(0,connectionIdx*2);return connectionIdx}
+function animate(){requestAnimationFrame(animate);const elapsed=clock.getElapsedTime(),delta=Math.min(clock.getDelta(),.05);frameCount++;if(elapsed-lastFpsTime>=.5){document.getElementById("fpsCount").textContent=Math.round(frameCount/(elapsed-lastFpsTime));frameCount=0;lastFpsTime=elapsed}orbitAngle.x+=(targetOrbit.x-orbitAngle.x)*.05;orbitAngle.y+=(targetOrbit.y-orbitAngle.y)*.05;zoomLevel+=(targetZoom-zoomLevel)*.08;isDragging||(targetOrbit.x+=.001);camera.position.x=Math.sin(orbitAngle.x)*Math.cos(orbitAngle.y)*zoomLevel;camera.position.y=Math.sin(orbitAngle.y)*zoomLevel*.5+2;camera.position.z=Math.cos(orbitAngle.x)*Math.cos(orbitAngle.y)*zoomLevel;camera.lookAt(0,0,0);particleMaterial.uniforms.uTime.value=elapsed;particleMaterial.uniforms.uMouse.value.copy(mouse3D);particleMaterial.uniforms.uPulse.value=pulseActive?1:0;const pos=geometry.attributes.position.array;for(let i=0;i<PARTICLE_COUNT;i++){const i3=i*3;pos[i3]+=(targetPositions[i3]-pos[i3])*.03;pos[i3+1]+=(targetPositions[i3+1]-pos[i3+1])*.03;pos[i3+2]+=(targetPositions[i3+2]-pos[i3+2])*.03;if(currentMode==="wave"){const cols=Math.ceil(Math.sqrt(PARTICLE_COUNT)),x=i%cols/cols,z=Math.floor(i/cols)/cols;pos[i3+1]=Math.sin(x*8+elapsed*1.5)*Math.cos(z*8+elapsed*1.2)*1.5}if(currentMode==="galaxy"){const cx=pos[i3],cz=pos[i3+2],dist=Math.sqrt(cx*cx+cz*cz),speed=.02/(dist*.1+1),cos=Math.cos(speed),sin=Math.sin(speed);targetPositions[i3]=cx*cos-cz*sin;targetPositions[i3+2]=cx*sin+cz*cos}if(currentMode==="helix"){targetPositions[i3+1]+=.01;if(targetPositions[i3+1]>9)targetPositions[i3+1]=-9}}geometry.attributes.position.needsUpdate=!0;const connCount=updateConnections();bgStars.rotation.y=elapsed*.02;bgStars.rotation.x=elapsed*.01;document.getElementById("nodeCount").textContent=PARTICLE_COUNT.toLocaleString();document.getElementById("connectionCount").textContent=connCount.toLocaleString();renderer.render(scene,camera)}
+addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);particleMaterial.uniforms.uPixelRatio.value=renderer.getPixelRatio()});animate();
+</script>
+</body>
+</html>
