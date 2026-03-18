@@ -4,6 +4,114 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OneWave AI — Neural Cosmos</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#050510;overflow:hidden;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:#fff}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+canvas{display:block;position:fixed;top:0;left:0}
+#ui{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
+#logo{position:fixed;top:32px;left:32px;display:flex;align-items:center;gap:12px;z-index:20}
+#logo svg{width:36px;height:36px}
+#logo span{font-size:18px;font-weight:600;letter-spacing:1.5px;background:linear-gradient(135deg,#818cf8,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#title{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:20;pointer-events:none;opacity:0;animation:titleFade 3s ease forwards 0.5s}
+#title h1{font-size:clamp(36px,6vw,72px);font-weight:700;letter-spacing:-1px;background:linear-gradient(135deg,#c7d2fe 0%,#818cf8 30%,#06b6d4 60%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+#title p{font-size:14px;color:rgba(255,255,255,0.4);letter-spacing:3px;text-transform:uppercase}
+@keyframes titleFade{0%{opacity:0;transform:translate(-50%,-50%) scale(0.95)}50%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0.15;transform:translate(-50%,-50%) scale(1)}}
+#modes{position:fixed;bottom:32px;right:32px;display:flex;gap:8px;z-index:20;pointer-events:all}
+.mode-btn{padding:8px 16px;border:1px solid rgba(255,255,255,0.15);border-radius:20px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);font-size:12px;font-family:inherit;letter-spacing:1px;cursor:pointer;transition:all 0.3s;backdrop-filter:blur(10px)}
+.mode-btn:hover{background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.3)}
+.mode-btn.active{background:linear-gradient(135deg,rgba(129,140,248,0.3),rgba(6,182,212,0.3));border-color:rgba(129,140,248,0.5);color:#fff}
+#stats{position:fixed;bottom:32px;left:32px;display:flex;gap:32px;z-index:20}
+.stat{text-align:left}
+.stat-val{font-size:20px;font-weight:600;background:linear-gradient(135deg,#818cf8,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-top:2px}
+#sound-btn{position:fixed;top:32px;right:32px;z-index:20;pointer-events:all;padding:8px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:16px;background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.4);font-size:11px;font-family:inherit;cursor:pointer;backdrop-filter:blur(10px);transition:all 0.3s}
+#sound-btn:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7)}
+</style>
+</head>
+<body>
+<div id="ui">
+<div id="logo"><svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" stroke="url(#lg)" stroke-width="1.5"/><path d="M10 18c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="url(#lg)" stroke-width="1.5" stroke-linecap="round"/><path d="M13 18c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="url(#lg)" stroke-width="1.5" stroke-linecap="round"/><circle cx="18" cy="18" r="2" fill="url(#lg)"/><defs><linearGradient id="lg" x1="0" y1="0" x2="36" y2="36"><stop stop-color="#818cf8"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs></svg><span>ONEWAVE AI</span></div>
+<div id="title"><h1>Neural Cosmos</h1><p>Interactive Particle Universe</p></div>
+<div id="stats"><div class="stat"><div class="stat-val" id="nc">0</div><div class="stat-label">Particles</div></div><div class="stat"><div class="stat-val" id="cc">0</div><div class="stat-label">Connections</div></div><div class="stat"><div class="stat-val" id="fp">0</div><div class="stat-label">FPS</div></div></div>
+<div id="modes"></div>
+<button id="sound-btn" onclick="toggleSound()">Sound Off</button>
+</div>
+<script>
+const MODES=['Galaxy','Nebula','DNA Helix','Neural Net','Wave','Vortex'];
+let currentMode=0,targetPositions,transitioning=false,transitionProgress=1;
+const N=5000,mouse={x:0,y:0,active:false},clock=new THREE.Clock();
+let scene,camera,renderer,particles,positions,colors,sizes,velocities;
+let audioCtx,gainNode,soundOn=false,frameCount=0,lastFps=0,lastTime=performance.now();
+const modesDiv=document.getElementById('modes');
+MODES.forEach((m,i)=>{const b=document.createElement('button');b.className='mode-btn'+(i===0?' active':'');b.textContent=m;b.onclick=()=>switchMode(i);modesDiv.appendChild(b)});
+scene=new THREE.Scene();
+scene.fog=new THREE.FogExp2(0x050510,0.0008);
+camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,1,5000);
+camera.position.set(0,100,400);
+renderer=new THREE.WebGLRenderer({antialias:false,alpha:false});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setClearColor(0x050510);
+document.body.appendChild(renderer.domElement);
+const geo=new THREE.BufferGeometry();
+positions=new Float32Array(N*3);colors=new Float32Array(N*3);sizes=new Float32Array(N);velocities=new Float32Array(N*3);targetPositions=new Float32Array(N*3);
+const phases=new Float32Array(N);
+const palette=[new THREE.Color('#818cf8'),new THREE.Color('#06b6d4'),new THREE.Color('#a78bfa'),new THREE.Color('#ec4899'),new THREE.Color('#22d3ee'),new THREE.Color('#f472b6')];
+for(let i=0;i<N;i++){const i3=i*3;positions[i3]=Math.random()*800-400;positions[i3+1]=Math.random()*800-400;positions[i3+2]=Math.random()*800-400;const c=palette[Math.floor(Math.random()*palette.length)];colors[i3]=c.r;colors[i3+1]=c.g;colors[i3+2]=c.b;sizes[i]=Math.random()*3+1;phases[i]=Math.random()*Math.PI*2;velocities[i3]=(Math.random()-0.5)*0.2;velocities[i3+1]=(Math.random()-0.5)*0.2;velocities[i3+2]=(Math.random()-0.5)*0.2}
+geo.setAttribute('position',new THREE.BufferAttribute(positions,3));geo.setAttribute('color',new THREE.BufferAttribute(colors,3));geo.setAttribute('size',new THREE.BufferAttribute(sizes,1));
+const vertexShader='attribute float size;varying vec3 vColor;varying float vAlpha;void main(){vColor=color;vec4 mvPos=modelViewMatrix*vec4(position,1.0);gl_PointSize=size*(300.0/-mvPos.z);gl_Position=projectionMatrix*mvPos;vAlpha=clamp(1.0-length(mvPos.xyz)/2000.0,0.1,1.0);}';
+const fragmentShader='varying vec3 vColor;varying float vAlpha;void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;float a=smoothstep(0.5,0.1,d)*vAlpha*0.85;gl_FragColor=vec4(vColor,a);}';
+const mat=new THREE.ShaderMaterial({vertexShader,fragmentShader,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,vertexColors:true});
+particles=new THREE.Points(geo,mat);scene.add(particles);
+const starGeo=new THREE.BufferGeometry();const starPos=new Float32Array(2000*3);const starSizes=new Float32Array(2000);
+for(let i=0;i<2000;i++){starPos[i*3]=(Math.random()-0.5)*4000;starPos[i*3+1]=(Math.random()-0.5)*4000;starPos[i*3+2]=(Math.random()-0.5)*4000;starSizes[i]=Math.random()*1.5+0.3}
+starGeo.setAttribute('position',new THREE.BufferAttribute(starPos,3));starGeo.setAttribute('size',new THREE.BufferAttribute(starSizes,1));
+const starMat=new THREE.ShaderMaterial({vertexShader:'attribute float size;varying float vA;void main(){vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=size*(200.0/-mv.z);gl_Position=projectionMatrix*mv;vA=clamp(1.0-length(mv.xyz)/3000.0,0.0,0.6);}',fragmentShader:'varying float vA;void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;gl_FragColor=vec4(0.7,0.75,0.9,smoothstep(0.5,0.0,d)*vA*0.4);}',transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+scene.add(new THREE.Points(starGeo,starMat));
+const lineGeo=new THREE.BufferGeometry();const linePos=new Float32Array(5000*2*3);const lineColors=new Float32Array(5000*2*3);
+lineGeo.setAttribute('position',new THREE.BufferAttribute(linePos,3));lineGeo.setAttribute('color',new THREE.BufferAttribute(lineColors,3));
+const lineMat=new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0.15,blending:THREE.AdditiveBlending,depthWrite:false});
+const lines=new THREE.LineSegments(lineGeo,lineMat);scene.add(lines);
+function generateMode(mode){const t=new Float32Array(N*3);for(let i=0;i<N;i++){const i3=i*3;const a=Math.random()*Math.PI*2,b=Math.random()*Math.PI*2;switch(mode){case 0:{const r=Math.random()*200+20,h=(Math.random()-0.5)*20*Math.exp(-r/150);t[i3]=Math.cos(a+r*0.03)*r;t[i3+1]=h;t[i3+2]=Math.sin(a+r*0.03)*r;break}case 1:{const r=Math.pow(Math.random(),0.5)*250;t[i3]=Math.cos(a)*Math.sin(b)*r+(Math.random()-0.5)*40;t[i3+1]=Math.sin(a)*Math.sin(b)*r+(Math.random()-0.5)*40;t[i3+2]=Math.cos(b)*r+(Math.random()-0.5)*40;break}case 2:{const s=i/N*Math.PI*8,r=50;const strand=i%2===0?1:-1;t[i3]=Math.cos(s)*r*strand;t[i3+1]=(i/N-0.5)*400;t[i3+2]=Math.sin(s)*r*strand;break}case 3:{const cluster=Math.floor(Math.random()*8);const cx=(cluster%4-1.5)*120,cy=Math.floor(cluster/4)*120-60;t[i3]=cx+(Math.random()-0.5)*80;t[i3+1]=cy+(Math.random()-0.5)*80;t[i3+2]=(Math.random()-0.5)*80;break}case 4:{const x=(i%100-50)*4,z=(Math.floor(i/100)-25)*4;t[i3]=x;t[i3+1]=Math.sin(x*0.05)*30+Math.cos(z*0.05)*30;t[i3+2]=z;break}case 5:{const r2=Math.random()*180+20,angle=a+r2*0.08;t[i3]=Math.cos(angle)*r2;t[i3+1]=(Math.random()-0.5)*r2*0.5;t[i3+2]=Math.sin(angle)*r2;break}}}return t}
+targetPositions=generateMode(0);for(let i=0;i<N*3;i++)positions[i]=targetPositions[i];
+function switchMode(idx){if(idx===currentMode&&!transitioning)return;currentMode=idx;targetPositions=generateMode(idx);transitioning=true;transitionProgress=0;document.querySelectorAll('.mode-btn').forEach((b,i)=>b.classList.toggle('active',i===idx))}
+let camAutoOrbit=true,mouseDown=false,lastMX=0,lastMY=0,camTheta=0,camPhi=Math.PI/6,camDist=400;
+window.addEventListener('mousemove',e=>{mouse.x=(e.clientX/innerWidth)*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;mouse.active=true;if(mouseDown){camTheta-=(e.clientX-lastMX)*0.005;camPhi-=(e.clientY-lastMY)*0.005;camPhi=Math.max(-Math.PI/2+0.1,Math.min(Math.PI/2-0.1,camPhi));camAutoOrbit=false;lastMX=e.clientX;lastMY=e.clientY}});
+window.addEventListener('mousedown',e=>{mouseDown=true;lastMX=e.clientX;lastMY=e.clientY});
+window.addEventListener('mouseup',()=>{mouseDown=false;setTimeout(()=>camAutoOrbit=true,5000)});
+window.addEventListener('wheel',e=>{camDist+=e.deltaY*0.5;camDist=Math.max(100,Math.min(1200,camDist))});
+window.addEventListener('touchmove',e=>{const t=e.touches[0];mouse.x=(t.clientX/innerWidth)*2-1;mouse.y=-(t.clientY/innerHeight)*2+1;mouse.active=true},{passive:true});
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+function toggleSound(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();soundOn=!soundOn;document.getElementById('sound-btn').textContent=soundOn?'Sound On':'Sound Off';if(soundOn){gainNode=audioCtx.createGain();gainNode.gain.value=0.03;gainNode.connect(audioCtx.destination);const osc1=audioCtx.createOscillator();osc1.type='sine';osc1.frequency.value=110;osc1.connect(gainNode);osc1.start();const osc2=audioCtx.createOscillator();osc2.type='sine';osc2.frequency.value=165;osc2.connect(gainNode);osc2.start();window._oscs=[osc1,osc2]}else if(window._oscs){window._oscs.forEach(o=>o.stop());gainNode.disconnect()}}
+function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();
+if(camAutoOrbit)camTheta+=0.002;
+camera.position.x=Math.cos(camTheta)*Math.cos(camPhi)*camDist;camera.position.y=Math.sin(camPhi)*camDist;camera.position.z=Math.sin(camTheta)*Math.cos(camPhi)*camDist;camera.lookAt(0,0,0);
+if(transitioning){transitionProgress+=0.015;if(transitionProgress>=1){transitionProgress=1;transitioning=false}const ease=transitionProgress<0.5?4*transitionProgress*transitionProgress*transitionProgress:1-Math.pow(-2*transitionProgress+2,3)/2;for(let i=0;i<N*3;i++)positions[i]+=(targetPositions[i]-positions[i])*ease*0.05}
+let conns=0;const lp=lineGeo.attributes.position.array;const lc=lineGeo.attributes.color.array;
+for(let i=0;i<N;i++){const i3=i*3;const p=phases[i]+t;
+if(currentMode===0){positions[i3]+=Math.sin(p*0.5)*0.1;positions[i3+1]+=Math.cos(p*0.3)*0.05}
+else if(currentMode===4){positions[i3+1]=targetPositions[i3+1]+Math.sin(t*2+positions[i3]*0.02)*15+Math.cos(t*1.5+positions[i3+2]*0.02)*15}
+else if(currentMode===2){const s=i/N*Math.PI*8+t*0.5;const strand=i%2===0?1:-1;positions[i3]=Math.cos(s)*50*strand;positions[i3+2]=Math.sin(s)*50*strand}
+else if(currentMode===5){const angle=t*0.3;positions[i3]=targetPositions[i3]*Math.cos(angle*0.1)-targetPositions[i3+2]*Math.sin(angle*0.1);positions[i3+2]=targetPositions[i3]*Math.sin(angle*0.1)+targetPositions[i3+2]*Math.cos(angle*0.1)}
+if(mouse.active){const ray=new THREE.Vector3(mouse.x,mouse.y,0.5).unproject(camera);const dir=ray.sub(camera.position).normalize();const dist=new THREE.Vector3(positions[i3],positions[i3+1],positions[i3+2]).sub(camera.position);const proj=dist.dot(dir);const closest=camera.position.clone().add(dir.multiplyScalar(proj));const d=new THREE.Vector3(positions[i3]-closest.x,positions[i3+1]-closest.y,positions[i3+2]-closest.z);const dl=d.length();if(dl<80&&dl>0.1){const force=0.5*(1-dl/80);positions[i3]+=d.x/dl*force;positions[i3+1]+=d.y/dl*force;positions[i3+2]+=d.z/dl*force}}
+sizes[i]=Math.max(1,(Math.sin(p*2+t)*0.5+2));
+const ci=Math.floor((i+t*10)%palette.length);const nc=palette[ci];colors[i3]+=(nc.r-colors[i3])*0.001;colors[i3+1]+=(nc.g-colors[i3+1])*0.001;colors[i3+2]+=(nc.b-colors[i3+2])*0.001;
+if(i<500&&conns<2500){for(let j=i+1;j<Math.min(i+20,500);j++){const j3=j*3;const dx=positions[i3]-positions[j3],dy=positions[i3+1]-positions[j3+1],dz=positions[i3+2]-positions[j3+2];const d2=dx*dx+dy*dy+dz*dz;if(d2<3000){const ci6=conns*6;lp[ci6]=positions[i3];lp[ci6+1]=positions[i3+1];lp[ci6+2]=positions[i3+2];lp[ci6+3]=positions[j3];lp[ci6+4]=positions[j3+1];lp[ci6+5]=positions[j3+2];const a=(1-d2/3000)*0.5;lc[ci6]=colors[i3]*a;lc[ci6+1]=colors[i3+1]*a;lc[ci6+2]=colors[i3+2]*a;lc[ci6+3]=colors[j3]*a;lc[ci6+4]=colors[j3+1]*a;lc[ci6+5]=colors[j3+2]*a;conns++}}}}
+lineGeo.setDrawRange(0,conns*2);geo.attributes.position.needsUpdate=true;geo.attributes.color.needsUpdate=true;geo.attributes.size.needsUpdate=true;lineGeo.attributes.position.needsUpdate=true;lineGeo.attributes.color.needsUpdate=true;
+frameCount++;const now=performance.now();if(now-lastTime>=1000){lastFps=frameCount;frameCount=0;lastTime=now}
+document.getElementById('nc').textContent=N.toLocaleString();document.getElementById('cc').textContent=conns.toLocaleString();document.getElementById('fp').textContent=lastFps;
+renderer.render(scene,camera)}
+animate();
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneWave AI — Neural Cosmos</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{overflow:hidden;background:#000;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#fff;cursor:crosshair}
