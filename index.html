@@ -5,69 +5,988 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OneWave AI — Neural Cosmos</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-body{overflow:hidden;background:#000;font-family:'Inter',-apple-system,sans-serif;cursor:crosshair;color:#fff}
-canvas{display:block}
-#overlay{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:10}
-#logo{position:fixed;top:36px;left:40px;z-index:20;display:flex;align-items:center;gap:14px;opacity:0;animation:fadeIn 1.5s ease .5s forwards}
-#logo svg{width:38px;height:38px}
-#logo span{font-size:20px;font-weight:600;letter-spacing:-.3px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,.7) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-#center-text{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:20;pointer-events:none;opacity:0;animation:fadeIn 2s ease 1s forwards}
-#center-text h1{font-size:clamp(32px,6vw,72px);font-weight:700;letter-spacing:-2px;line-height:1.1;background:linear-gradient(135deg,#fff 0%,#a78bfa 50%,#6366f1 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
-#center-text p{font-size:clamp(14px,2vw,18px);font-weight:300;color:rgba(255,255,255,.5);letter-spacing:3px;text-transform:uppercase}
-#stats{position:fixed;bottom:36px;left:40px;z-index:20;display:flex;gap:40px;opacity:0;animation:fadeIn 1.5s ease 1.5s forwards}
-.stat{display:flex;flex-direction:column;gap:4px}
-.stat-value{font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.stat-label{font-size:11px;font-weight:400;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase}
-#controls{position:fixed;bottom:36px;right:40px;z-index:20;display:flex;gap:10px;opacity:0;animation:fadeIn 1.5s ease 2s forwards}
-.ctrl-btn{padding:10px 20px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);color:rgba(255,255,255,.7);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;letter-spacing:.5px;border-radius:100px;cursor:pointer;pointer-events:all;transition:all .3s ease}
-.ctrl-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(167,139,250,.4);color:#fff}
-.ctrl-btn.active{background:rgba(99,102,241,.2);border-color:rgba(99,102,241,.5);color:#a78bfa}
-#hint{position:fixed;top:36px;right:40px;z-index:20;font-size:12px;color:rgba(255,255,255,.3);opacity:0;animation:fadeIn 1.5s ease 2.5s forwards,fadeOut 2s ease 8s forwards}
-@keyframes fadeIn{to{opacity:1}}
-@keyframes fadeOut{to{opacity:0}}
-#overlay::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.6) 100%)}
+body{overflow:hidden;background:#000;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#fff;cursor:crosshair}
+canvas{display:block;position:fixed;top:0;left:0}
+
+#ui{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
+#ui *{pointer-events:auto}
+
+/* Branding */
+#brand{position:fixed;top:24px;left:28px;display:flex;align-items:center;gap:12px;z-index:20}
+#brand svg{width:36px;height:36px;filter:drop-shadow(0 0 12px rgba(99,102,241,0.5))}
+#brand h1{font-size:18px;font-weight:600;letter-spacing:1.5px;
+  background:linear-gradient(135deg,#818cf8,#6366f1,#a78bfa,#c084fc);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-transform:uppercase}
+#brand span{font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.4);text-transform:uppercase;display:block;margin-top:2px}
+
+/* Mode Selector */
+#modes{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);display:flex;gap:6px;
+  background:rgba(15,15,25,0.6);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;padding:6px;z-index:20}
+.mode-btn{padding:10px 20px;border:none;background:transparent;color:rgba(255,255,255,0.5);
+  font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+  border-radius:12px;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);white-space:nowrap}
+.mode-btn:hover{color:rgba(255,255,255,0.8);background:rgba(255,255,255,0.05)}
+.mode-btn.active{color:#fff;background:linear-gradient(135deg,rgba(99,102,241,0.3),rgba(168,85,247,0.3));
+  box-shadow:0 0 20px rgba(99,102,241,0.2),inset 0 0 20px rgba(99,102,241,0.1)}
+
+/* Stats */
+#stats{position:fixed;top:24px;right:28px;text-align:right;z-index:20}
+#stats div{font-size:11px;letter-spacing:1px;color:rgba(255,255,255,0.35);line-height:1.8}
+#stats .val{color:rgba(255,255,255,0.7);font-variant-numeric:tabular-nums;font-weight:500}
+
+/* Controls */
+#controls{position:fixed;top:50%;right:28px;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px;z-index:20}
+.ctrl-btn{width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);
+  background:rgba(15,15,25,0.5);backdrop-filter:blur(12px);color:rgba(255,255,255,0.5);
+  font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all 0.3s ease}
+.ctrl-btn:hover{border-color:rgba(99,102,241,0.4);color:#fff;background:rgba(99,102,241,0.15)}
+.ctrl-btn.active{border-color:rgba(99,102,241,0.5);color:#a78bfa;background:rgba(99,102,241,0.2)}
+
+/* Info tooltip */
+#info{position:fixed;bottom:32px;right:28px;font-size:10px;color:rgba(255,255,255,0.25);
+  letter-spacing:1px;text-transform:uppercase;z-index:20;text-align:right;line-height:1.8}
+
+/* Loading */
+#loader{position:fixed;top:0;left:0;width:100%;height:100%;background:#08080f;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;
+  transition:opacity 0.8s ease}
+#loader.hide{opacity:0;pointer-events:none}
+#loader .bar{width:200px;height:2px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;margin-top:20px}
+#loader .bar-fill{width:0%;height:100%;background:linear-gradient(90deg,#6366f1,#a78bfa);
+  border-radius:2px;transition:width 0.3s ease}
+#loader p{font-size:11px;letter-spacing:3px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-top:12px}
+
+/* Mobile */
+@media(max-width:768px){
+  #modes{bottom:16px;gap:4px;padding:4px}
+  .mode-btn{padding:8px 12px;font-size:10px}
+  #brand{top:16px;left:16px}
+  #brand h1{font-size:14px}
+  #stats{top:16px;right:16px}
+  #stats div{font-size:10px}
+  #controls{right:16px}
+  #info{display:none}
+}
 </style>
 </head>
 <body>
-<div id="overlay"></div>
-<div id="logo"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g1" x1="0" y1="0" x2="40" y2="40"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#6366f1"/></linearGradient></defs><circle cx="20" cy="20" r="18" stroke="url(#g1)" stroke-width="2.5" fill="none"/><path d="M12 24 C12 24,16 12,20 18 C24 24,28 14,28 14" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg><span>OneWave AI</span></div>
-<div id="center-text"><h1>Neural Cosmos</h1><p>Move your cursor to explore</p></div>
-<div id="stats"><div class="stat"><span class="stat-value" id="nodeCount">0</span><span class="stat-label">Nodes</span></div><div class="stat"><span class="stat-value" id="connectionCount">0</span><span class="stat-label">Connections</span></div><div class="stat"><span class="stat-value" id="fpsCount">60</span><span class="stat-label">FPS</span></div></div>
-<div id="controls"><button class="ctrl-btn active" onclick="setMode('galaxy')">Galaxy</button><button class="ctrl-btn" onclick="setMode('helix')">DNA Helix</button><button class="ctrl-btn" onclick="setMode('sphere')">Sphere</button><button class="ctrl-btn" onclick="setMode('wave')">Wave</button><button class="ctrl-btn" onclick="togglePulse(this)">Pulse</button></div>
-<div id="hint">Click &amp; drag to orbit • Scroll to zoom</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-const PARTICLE_COUNT=4000,CONNECTION_DISTANCE=2.2,MOUSE_INFLUENCE=3,PALETTE=[new THREE.Color(0xa78bfa),new THREE.Color(0x6366f1),new THREE.Color(0x818cf8),new THREE.Color(0xc4b5fd),new THREE.Color(0x4f46e5),new THREE.Color(0x7c3aed)];
-const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0,.035);
-const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,1e3);camera.position.set(0,2,18);
-const renderer=new THREE.WebGLRenderer({antialias:!0,alpha:!0});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(0);document.body.insertBefore(renderer.domElement,document.body.firstChild);
-const mouse=new THREE.Vector2(0,0),mouse3D=new THREE.Vector3(0,0,0);let isDragging=!1,prevMouse={x:0,y:0},orbitAngle={x:0,y:0},targetOrbit={x:0,y:0},zoomLevel=18,targetZoom=18;
-addEventListener("mousemove",e=>{mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;mouse3D.set(mouse.x*8,mouse.y*5,0);isDragging&&(targetOrbit.x+=(e.clientX-prevMouse.x)*.005,targetOrbit.y+=(e.clientY-prevMouse.y)*.003,targetOrbit.y=Math.max(-1.2,Math.min(1.2,targetOrbit.y)));prevMouse={x:e.clientX,y:e.clientY}});
-addEventListener("mousedown",e=>{isDragging=!0;prevMouse={x:e.clientX,y:e.clientY}});addEventListener("mouseup",()=>isDragging=!1);
-addEventListener("wheel",e=>{targetZoom+=e.deltaY*.01;targetZoom=Math.max(6,Math.min(35,targetZoom))});
-addEventListener("touchmove",e=>{const t=e.touches[0];mouse.x=t.clientX/innerWidth*2-1;mouse.y=-(t.clientY/innerHeight)*2+1;mouse3D.set(mouse.x*8,mouse.y*5,0)},{passive:!0});
-const geometry=new THREE.BufferGeometry,positions=new Float32Array(PARTICLE_COUNT*3),colors=new Float32Array(PARTICLE_COUNT*3),sizes=new Float32Array(PARTICLE_COUNT),targetPositions=new Float32Array(PARTICLE_COUNT*3),velocities=new Float32Array(PARTICLE_COUNT*3),originalPositions=new Float32Array(PARTICLE_COUNT*3);
-for(let i=0;i<PARTICLE_COUNT;i++){const i3=i*3,angle=i/PARTICLE_COUNT*Math.PI*12,radius=Math.sqrt(i/PARTICLE_COUNT)*10,armOffset=i%3/3*Math.PI*2,jitter=(Math.random()-.5)*1.5;positions[i3]=Math.cos(angle+armOffset)*radius+jitter;positions[i3+1]=(Math.random()-.5)*1.5;positions[i3+2]=Math.sin(angle+armOffset)*radius+jitter;originalPositions[i3]=positions[i3];originalPositions[i3+1]=positions[i3+1];originalPositions[i3+2]=positions[i3+2];targetPositions[i3]=positions[i3];targetPositions[i3+1]=positions[i3+1];targetPositions[i3+2]=positions[i3+2];const color=PALETTE[Math.floor(Math.random()*PALETTE.length)];colors[i3]=color.r;colors[i3+1]=color.g;colors[i3+2]=color.b;sizes[i]=Math.random()*3+1;velocities[i3]=0;velocities[i3+1]=0;velocities[i3+2]=0}
-geometry.setAttribute("position",new THREE.BufferAttribute(positions,3));geometry.setAttribute("color",new THREE.BufferAttribute(colors,3));geometry.setAttribute("size",new THREE.BufferAttribute(sizes,1));
-const particleMaterial=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uPixelRatio:{value:renderer.getPixelRatio()},uMouse:{value:new THREE.Vector3},uPulse:{value:0}},vertexShader:"attribute float size;attribute vec3 color;varying vec3 vColor;varying float vDist;uniform float uTime;uniform float uPixelRatio;uniform vec3 uMouse;uniform float uPulse;void main(){vColor=color;vec3 pos=position;float dist=distance(pos.xy,uMouse.xy);float influence=smoothstep(4.0,0.0,dist);pos.z+=influence*2.0;if(uPulse>0.0){float pulseDist=length(pos);float pulseWave=sin(pulseDist*1.5-uTime*3.0)*uPulse;pos+=normalize(pos)*pulseWave*0.5;}vec4 mvPosition=modelViewMatrix*vec4(pos,1.0);vDist=-mvPosition.z;float dynamicSize=size*(1.0+influence*2.0);dynamicSize*=(1.0+sin(uTime*2.0+float(gl_VertexID)*0.1)*0.15);gl_PointSize=dynamicSize*uPixelRatio*(200.0/-mvPosition.z);gl_PointSize=max(gl_PointSize,1.0);gl_Position=projectionMatrix*mvPosition;}",fragmentShader:"varying vec3 vColor;varying float vDist;void main(){float d=length(gl_PointCoord-vec2(0.5));if(d>0.5)discard;float alpha=1.0-smoothstep(0.0,0.5,d);alpha*=alpha;float distFade=smoothstep(40.0,5.0,vDist);vec3 glow=vColor*(1.0+(1.0-d*2.0)*0.5);gl_FragColor=vec4(glow,alpha*distFade*0.9);}",transparent:!0,blending:THREE.AdditiveBlending,depthWrite:!1});
-const particles=new THREE.Points(geometry,particleMaterial);scene.add(particles);
-const MAX_CONNECTIONS=3e3,linePositions=new Float32Array(MAX_CONNECTIONS*6),lineColors=new Float32Array(MAX_CONNECTIONS*6),lineGeometry=new THREE.BufferGeometry;lineGeometry.setAttribute("position",new THREE.BufferAttribute(linePositions,3));lineGeometry.setAttribute("color",new THREE.BufferAttribute(lineColors,3));
-const lineMaterial=new THREE.LineBasicMaterial({vertexColors:!0,transparent:!0,opacity:.15,blending:THREE.AdditiveBlending,depthWrite:!1});const lines=new THREE.LineSegments(lineGeometry,lineMaterial);scene.add(lines);
-const bgCount=2e3,bgGeo=new THREE.BufferGeometry,bgPos=new Float32Array(bgCount*3);for(let i=0;i<bgCount*3;i++)bgPos[i]=(Math.random()-.5)*80;bgGeo.setAttribute("position",new THREE.BufferAttribute(bgPos,3));const bgMat=new THREE.PointsMaterial({size:.08,color:0x444466,transparent:!0,opacity:.6,blending:THREE.AdditiveBlending});const bgStars=new THREE.Points(bgGeo,bgMat);scene.add(bgStars);
-let currentMode="galaxy",pulseActive=!1,morphProgress=0,isMorphing=!1;
-function generateGalaxy(i){const angle=i/PARTICLE_COUNT*Math.PI*12,radius=Math.sqrt(i/PARTICLE_COUNT)*10,armOffset=i%3/3*Math.PI*2,jitter=(Math.random()-.5)*1.2;return[Math.cos(angle+armOffset)*radius+jitter,(Math.random()-.5)*1.2,Math.sin(angle+armOffset)*radius+jitter]}
-function generateHelix(i){const t=i/PARTICLE_COUNT*Math.PI*8,strand=i%2,radius=3,offset=strand*Math.PI,jitter=(Math.random()-.5)*.4;return[Math.cos(t+offset)*radius+jitter,(i/PARTICLE_COUNT-.5)*18+jitter,Math.sin(t+offset)*radius+jitter]}
-function generateSphere(i){const phi=Math.acos(1-2*(i/PARTICLE_COUNT)),theta=Math.PI*(1+Math.sqrt(5))*i,radius=6+(Math.random()-.5)*1.5;return[Math.sin(phi)*Math.cos(theta)*radius,Math.sin(phi)*Math.sin(theta)*radius,Math.cos(phi)*radius]}
-function generateWave(i){const cols=Math.ceil(Math.sqrt(PARTICLE_COUNT)),x=i%cols/cols,z=Math.floor(i/cols)/cols;return[(x-.5)*20,0,(z-.5)*20]}
-const generators={galaxy:generateGalaxy,helix:generateHelix,sphere:generateSphere,wave:generateWave};
-function setMode(mode){currentMode=mode;isMorphing=!0;morphProgress=0;document.querySelectorAll(".ctrl-btn").forEach(btn=>{btn.classList.toggle("active",btn.textContent.toLowerCase()===mode)});for(let i=0;i<PARTICLE_COUNT;i++){const pos=generators[mode](i);targetPositions[i*3]=pos[0];targetPositions[i*3+1]=pos[1];targetPositions[i*3+2]=pos[2]}}
-function togglePulse(btn){pulseActive=!pulseActive;btn.classList.toggle("active",pulseActive)}window.setMode=setMode;window.togglePulse=togglePulse;
-const clock=new THREE.Clock;let frameCount=0,lastFpsTime=0;
-function updateConnections(){let connectionIdx=0;const pos=geometry.attributes.position.array,col=geometry.attributes.color.array,step=Math.max(1,Math.floor(PARTICLE_COUNT/400));for(let i=0;i<PARTICLE_COUNT&&connectionIdx<MAX_CONNECTIONS;i+=step)for(let j=i+step;j<PARTICLE_COUNT&&connectionIdx<MAX_CONNECTIONS;j+=step){const dx=pos[i*3]-pos[j*3],dy=pos[i*3+1]-pos[j*3+1],dz=pos[i*3+2]-pos[j*3+2],dist=Math.sqrt(dx*dx+dy*dy+dz*dz);if(dist<CONNECTION_DISTANCE){const alpha=1-dist/CONNECTION_DISTANCE,ci=connectionIdx*6;linePositions[ci]=pos[i*3];linePositions[ci+1]=pos[i*3+1];linePositions[ci+2]=pos[i*3+2];linePositions[ci+3]=pos[j*3];linePositions[ci+4]=pos[j*3+1];linePositions[ci+5]=pos[j*3+2];lineColors[ci]=col[i*3]*alpha;lineColors[ci+1]=col[i*3+1]*alpha;lineColors[ci+2]=col[i*3+2]*alpha;lineColors[ci+3]=col[j*3]*alpha;lineColors[ci+4]=col[j*3+1]*alpha;lineColors[ci+5]=col[j*3+2]*alpha;connectionIdx++}}for(let i=connectionIdx*6;i<MAX_CONNECTIONS*6;i++){linePositions[i]=0;lineColors[i]=0}lineGeometry.attributes.position.needsUpdate=!0;lineGeometry.attributes.color.needsUpdate=!0;lineGeometry.setDrawRange(0,connectionIdx*2);return connectionIdx}
-function animate(){requestAnimationFrame(animate);const elapsed=clock.getElapsedTime(),delta=Math.min(clock.getDelta(),.05);frameCount++;if(elapsed-lastFpsTime>=.5){document.getElementById("fpsCount").textContent=Math.round(frameCount/(elapsed-lastFpsTime));frameCount=0;lastFpsTime=elapsed}orbitAngle.x+=(targetOrbit.x-orbitAngle.x)*.05;orbitAngle.y+=(targetOrbit.y-orbitAngle.y)*.05;zoomLevel+=(targetZoom-zoomLevel)*.08;isDragging||(targetOrbit.x+=.001);camera.position.x=Math.sin(orbitAngle.x)*Math.cos(orbitAngle.y)*zoomLevel;camera.position.y=Math.sin(orbitAngle.y)*zoomLevel*.5+2;camera.position.z=Math.cos(orbitAngle.x)*Math.cos(orbitAngle.y)*zoomLevel;camera.lookAt(0,0,0);particleMaterial.uniforms.uTime.value=elapsed;particleMaterial.uniforms.uMouse.value.copy(mouse3D);particleMaterial.uniforms.uPulse.value=pulseActive?1:0;const pos=geometry.attributes.position.array;for(let i=0;i<PARTICLE_COUNT;i++){const i3=i*3;pos[i3]+=(targetPositions[i3]-pos[i3])*.03;pos[i3+1]+=(targetPositions[i3+1]-pos[i3+1])*.03;pos[i3+2]+=(targetPositions[i3+2]-pos[i3+2])*.03;if(currentMode==="wave"){const cols=Math.ceil(Math.sqrt(PARTICLE_COUNT)),x=i%cols/cols,z=Math.floor(i/cols)/cols;pos[i3+1]=Math.sin(x*8+elapsed*1.5)*Math.cos(z*8+elapsed*1.2)*1.5}if(currentMode==="galaxy"){const cx=pos[i3],cz=pos[i3+2],dist=Math.sqrt(cx*cx+cz*cz),speed=.02/(dist*.1+1),cos=Math.cos(speed),sin=Math.sin(speed);targetPositions[i3]=cx*cos-cz*sin;targetPositions[i3+2]=cx*sin+cz*cos}if(currentMode==="helix"){targetPositions[i3+1]+=.01;if(targetPositions[i3+1]>9)targetPositions[i3+1]=-9}}geometry.attributes.position.needsUpdate=!0;const connCount=updateConnections();bgStars.rotation.y=elapsed*.02;bgStars.rotation.x=elapsed*.01;document.getElementById("nodeCount").textContent=PARTICLE_COUNT.toLocaleString();document.getElementById("connectionCount").textContent=connCount.toLocaleString();renderer.render(scene,camera)}
-addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);particleMaterial.uniforms.uPixelRatio.value=renderer.getPixelRatio()});animate();
+
+<div id="loader">
+  <svg width="48" height="48" viewBox="0 0 100 100" fill="none">
+    <defs>
+      <linearGradient id="lg" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#818cf8"/>
+        <stop offset="50%" stop-color="#6366f1"/>
+        <stop offset="100%" stop-color="#a78bfa"/>
+      </linearGradient>
+    </defs>
+    <circle cx="50" cy="50" r="40" stroke="url(#lg)" stroke-width="3" fill="none" opacity="0.3"/>
+    <circle cx="50" cy="50" r="25" stroke="url(#lg)" stroke-width="2" fill="none" opacity="0.5"/>
+    <circle cx="50" cy="50" r="8" fill="url(#lg)" opacity="0.8"/>
+  </svg>
+  <div class="bar"><div class="bar-fill" id="loaderBar"></div></div>
+  <p>Initializing Neural Cosmos</p>
+</div>
+
+<div id="ui">
+  <div id="brand">
+    <svg viewBox="0 0 100 100" fill="none">
+      <defs>
+        <linearGradient id="logo-g" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#818cf8"/>
+          <stop offset="50%" stop-color="#6366f1"/>
+          <stop offset="100%" stop-color="#c084fc"/>
+        </linearGradient>
+      </defs>
+      <circle cx="50" cy="50" r="44" stroke="url(#logo-g)" stroke-width="2.5" fill="none"/>
+      <circle cx="50" cy="50" r="28" stroke="url(#logo-g)" stroke-width="1.5" fill="none" opacity="0.6"/>
+      <path d="M30 55 Q50 20 70 55" stroke="url(#logo-g)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="50" cy="42" r="5" fill="url(#logo-g)"/>
+    </svg>
+    <div>
+      <h1>OneWave AI</h1>
+      <span>Neural Cosmos</span>
+    </div>
+  </div>
+
+  <div id="stats">
+    <div>Nodes <span class="val" id="s-nodes">0</span></div>
+    <div>Links <span class="val" id="s-links">0</span></div>
+    <div>FPS <span class="val" id="s-fps">0</span></div>
+    <div>Mode <span class="val" id="s-mode">Galaxy</span></div>
+  </div>
+
+  <div id="modes">
+    <button class="mode-btn active" data-mode="galaxy">Galaxy</button>
+    <button class="mode-btn" data-mode="dna">DNA Helix</button>
+    <button class="mode-btn" data-mode="neural">Neural Net</button>
+    <button class="mode-btn" data-mode="wave">Wave Field</button>
+    <button class="mode-btn" data-mode="nebula">Nebula</button>
+  </div>
+
+  <div id="controls">
+    <button class="ctrl-btn" id="btn-sound" title="Toggle Sound">♪</button>
+    <button class="ctrl-btn" id="btn-orbit" title="Toggle Auto-Orbit">◎</button>
+    <button class="ctrl-btn" id="btn-burst" title="Particle Burst">✦</button>
+  </div>
+
+  <div id="info">
+    Click to burst · Drag to orbit<br>
+    Scroll to zoom · Move to interact
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.164.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.164.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ─── CONFIG ───
+const CONFIG = {
+  particleCount: 8000,
+  bgStarCount: 3000,
+  connectionDistance: 1.8,
+  maxConnections: 800,
+  mouseRadius: 3.0,
+  mouseStrength: 0.4,
+  transitionSpeed: 0.02,
+  bloomStrength: 0.35,
+  bloomRadius: 0.4,
+  bloomThreshold: 0.6,
+  cameraDistance: 12,
+  autoOrbitSpeed: 0.08,
+  burstCount: 200,
+  colorCycleSpeed: 0.0003
+};
+
+const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
+if (isMobile) {
+  CONFIG.particleCount = 3000;
+  CONFIG.bgStarCount = 1000;
+  CONFIG.maxConnections = 300;
+  CONFIG.burstCount = 80;
+}
+
+// ─── COLOR PALETTES ───
+const PALETTES = [
+  { a: [0.40, 0.30, 1.00], b: [0.70, 0.20, 0.90], c: [0.20, 0.60, 1.00], bg: [0.02, 0.02, 0.05] },
+  { a: [0.00, 0.90, 0.80], b: [0.00, 0.50, 1.00], c: [0.30, 1.00, 0.70], bg: [0.01, 0.03, 0.04] },
+  { a: [1.00, 0.40, 0.60], b: [0.90, 0.20, 0.80], c: [1.00, 0.60, 0.30], bg: [0.04, 0.01, 0.03] },
+  { a: [0.60, 0.80, 0.20], b: [0.20, 1.00, 0.60], c: [0.00, 0.70, 0.90], bg: [0.02, 0.03, 0.01] },
+  { a: [1.00, 0.70, 0.20], b: [1.00, 0.40, 0.40], c: [0.80, 0.60, 1.00], bg: [0.04, 0.02, 0.01] },
+];
+
+let currentPalette = 0;
+let paletteT = 0;
+
+function lerpColor(a, b, t) {
+  return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t];
+}
+
+function getCurrentColors() {
+  const p1 = PALETTES[currentPalette];
+  const p2 = PALETTES[(currentPalette + 1) % PALETTES.length];
+  return {
+    a: lerpColor(p1.a, p2.a, paletteT),
+    b: lerpColor(p1.b, p2.b, paletteT),
+    c: lerpColor(p1.c, p2.c, paletteT),
+    bg: lerpColor(p1.bg, p2.bg, paletteT)
+  };
+}
+
+// ─── SCENE SETUP ───
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+camera.position.set(0, 3, CONFIG.cameraDistance);
+
+const renderer = new THREE.WebGLRenderer({
+  antialias: true,
+  alpha: false,
+  powerPreference: 'high-performance'
+});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+// ─── CONTROLS ───
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.enablePan = false;
+controls.minDistance = 4;
+controls.maxDistance = 30;
+controls.autoRotate = true;
+controls.autoRotateSpeed = CONFIG.autoOrbitSpeed;
+
+// ─── POST-PROCESSING ───
+const composer = new EffectComposer(renderer);
+const renderPass = new RenderPass(scene, camera);
+composer.addPass(renderPass);
+
+const bloomPass = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  CONFIG.bloomStrength,
+  CONFIG.bloomRadius,
+  CONFIG.bloomThreshold
+);
+composer.addPass(bloomPass);
+
+// ─── FORMATION GENERATORS ───
+function generateGalaxy(count) {
+  const positions = new Float32Array(count * 3);
+  const arms = 4;
+  for (let i = 0; i < count; i++) {
+    const i3 = i * 3;
+    const arm = i % arms;
+    const armAngle = (arm / arms) * Math.PI * 2;
+    const radius = Math.pow(Math.random(), 0.6) * 6;
+    const spin = radius * 0.8;
+    const angle = armAngle + spin;
+    const scatter = (1 - Math.pow(radius / 6, 2)) * 0.8 + 0.1;
+    positions[i3] = Math.cos(angle) * radius + (Math.random() - 0.5) * scatter;
+    positions[i3+1] = (Math.random() - 0.5) * scatter * 0.4;
+    positions[i3+2] = Math.sin(angle) * radius + (Math.random() - 0.5) * scatter;
+  }
+  return positions;
+}
+
+function generateDNA(count) {
+  const positions = new Float32Array(count * 3);
+  const length = 12;
+  for (let i = 0; i < count; i++) {
+    const i3 = i * 3;
+    const t = (i / count) * length - length / 2;
+    const strand = i % 3;
+    if (strand < 2) {
+      const angle = t * 1.2 + (strand === 0 ? 0 : Math.PI);
+      const radius = 1.5;
+      positions[i3] = Math.cos(angle) * radius + (Math.random()-0.5)*0.15;
+      positions[i3+1] = t + (Math.random()-0.5)*0.1;
+      positions[i3+2] = Math.sin(angle) * radius + (Math.random()-0.5)*0.15;
+    } else {
+      const angle = t * 1.2;
+      const lerp = Math.random();
+      const r = 1.5;
+      positions[i3] = Math.cos(angle)*r*lerp + Math.cos(angle+Math.PI)*r*(1-lerp) + (Math.random()-0.5)*0.1;
+      positions[i3+1] = t + (Math.random()-0.5)*0.1;
+      positions[i3+2] = Math.sin(angle)*r*lerp + Math.sin(angle+Math.PI)*r*(1-lerp) + (Math.random()-0.5)*0.1;
+    }
+  }
+  return positions;
+}
+
+function generateNeural(count) {
+  const positions = new Float32Array(count * 3);
+  const layers = 5;
+  const nodesPerLayer = Math.floor(count / layers);
+  for (let i = 0; i < count; i++) {
+    const i3 = i * 3;
+    const layer = Math.floor(i / nodesPerLayer);
+    const inLayer = i % nodesPerLayer;
+    const layerX = (layer / (layers-1)) * 8 - 4;
+    const phi = Math.acos(2 * (inLayer / nodesPerLayer) - 1);
+    const theta = Math.sqrt(nodesPerLayer * Math.PI) * phi;
+    const r = 2.0 + Math.random() * 0.5;
+    positions[i3] = layerX + (Math.random()-0.5)*0.5;
+    positions[i3+1] = r * Math.cos(theta) * Math.sin(phi) * 0.6;
+    positions[i3+2] = r * Math.sin(theta) * Math.sin(phi) * 0.6;
+  }
+  return positions;
+}
+
+function generateWave(count) {
+  const positions = new Float32Array(count * 3);
+  const gridSize = Math.ceil(Math.sqrt(count));
+  const spacing = 10 / gridSize;
+  for (let i = 0; i < count; i++) {
+    const i3 = i * 3;
+    const gx = (i % gridSize) * spacing - 5;
+    const gz = Math.floor(i / gridSize) * spacing - 5;
+    const dist = Math.sqrt(gx*gx + gz*gz);
+    positions[i3] = gx;
+    positions[i3+1] = Math.sin(dist * 1.5) * Math.cos(gx * 0.5) * 1.2;
+    positions[i3+2] = gz;
+  }
+  return positions;
+}
+
+function generateNebula(count) {
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const i3 = i * 3;
+    const cluster = Math.floor(Math.random() * 4);
+    const cx = [2, -2, 0, 1][cluster];
+    const cy = [0, 1, -1, 2][cluster];
+    const cz = [-1, 1, 2, -2][cluster];
+    const r = Math.pow(Math.random(), 0.5) * 3;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    positions[i3] = cx + r * Math.sin(phi) * Math.cos(theta);
+    positions[i3+1] = cy + r * Math.sin(phi) * Math.sin(theta) * 0.6;
+    positions[i3+2] = cz + r * Math.cos(phi);
+  }
+  return positions;
+}
+
+const formations = { galaxy: generateGalaxy, dna: generateDNA, neural: generateNeural, wave: generateWave, nebula: generateNebula };
+
+// ─── PARTICLE SYSTEM ───
+const COUNT = CONFIG.particleCount;
+const currentPositions = new Float32Array(COUNT * 3);
+const targetPositions = new Float32Array(COUNT * 3);
+const velocities = new Float32Array(COUNT * 3);
+const basePositions = new Float32Array(COUNT * 3);
+const particleSizes = new Float32Array(COUNT);
+const particlePhase = new Float32Array(COUNT);
+const particleSpeed = new Float32Array(COUNT);
+
+for (let i = 0; i < COUNT; i++) {
+  particleSizes[i] = 0.3 + Math.random() * 0.7;
+  particlePhase[i] = Math.random() * Math.PI * 2;
+  particleSpeed[i] = 0.5 + Math.random() * 1.5;
+}
+
+// Initialize with galaxy
+const initPos = generateGalaxy(COUNT);
+currentPositions.set(initPos);
+targetPositions.set(initPos);
+basePositions.set(initPos);
+
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute('position', new THREE.BufferAttribute(currentPositions, 3));
+geometry.setAttribute('aSize', new THREE.BufferAttribute(particleSizes, 1));
+geometry.setAttribute('aPhase', new THREE.BufferAttribute(particlePhase, 1));
+geometry.setAttribute('aSpeed', new THREE.BufferAttribute(particleSpeed, 1));
+
+const vertexShader = `
+  uniform float uTime;
+  uniform float uPointSize;
+  uniform float uPixelRatio;
+  uniform vec3 uColorA;
+  uniform vec3 uColorB;
+  uniform vec3 uColorC;
+  uniform vec3 uMouse3D;
+  uniform float uMouseRadius;
+  uniform float uMouseStrength;
+  uniform float uTransition;
+
+  attribute float aSize;
+  attribute float aPhase;
+  attribute float aSpeed;
+
+  varying vec3 vColor;
+  varying float vAlpha;
+  varying float vDist;
+
+  // Simplex-ish noise
+  float hash(vec3 p) {
+    p = fract(p * vec3(0.1031, 0.1030, 0.0973));
+    p += dot(p, p.yxz + 33.33);
+    return fract((p.x + p.y) * p.z);
+  }
+
+  void main() {
+    vec3 pos = position;
+
+    // Subtle organic motion
+    float t = uTime * 0.3 * aSpeed;
+    pos.x += sin(t + aPhase) * 0.08;
+    pos.y += cos(t * 0.7 + aPhase * 2.0) * 0.08;
+    pos.z += sin(t * 0.5 + aPhase * 3.0) * 0.08;
+
+    // Mouse interaction - repulsion
+    vec3 toMouse = pos - uMouse3D;
+    float mouseDist = length(toMouse);
+    if (mouseDist < uMouseRadius && mouseDist > 0.001) {
+      float force = (1.0 - mouseDist / uMouseRadius);
+      force = force * force * uMouseStrength;
+      pos += normalize(toMouse) * force;
+    }
+
+    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+    gl_Position = projectionMatrix * mvPosition;
+
+    // Size with attenuation
+    float size = uPointSize * aSize * uPixelRatio;
+    size *= (1.0 / -mvPosition.z);
+    // Pulse
+    size *= 0.85 + 0.15 * sin(uTime * aSpeed + aPhase);
+    gl_PointSize = clamp(size, 1.0, 64.0);
+
+    // Color based on position and attributes
+    float colorMix = hash(position * 0.5 + uTime * 0.01);
+    float heightMix = (pos.y + 6.0) / 12.0;
+    vec3 col;
+    if (colorMix < 0.33) {
+      col = mix(uColorA, uColorB, heightMix);
+    } else if (colorMix < 0.66) {
+      col = mix(uColorB, uColorC, heightMix);
+    } else {
+      col = mix(uColorC, uColorA, heightMix);
+    }
+
+    // Proximity to mouse - brighten
+    float mouseGlow = smoothstep(uMouseRadius, 0.0, mouseDist) * 0.3;
+    col += mouseGlow;
+
+    vColor = col;
+    vAlpha = 0.6 + 0.4 * aSize;
+    vDist = -mvPosition.z;
+  }
+`;
+
+const fragmentShader = `
+  varying vec3 vColor;
+  varying float vAlpha;
+  varying float vDist;
+
+  void main() {
+    // Soft circle with glow
+    vec2 center = gl_PointCoord - 0.5;
+    float dist = length(center);
+
+    // Core
+    float core = smoothstep(0.5, 0.05, dist);
+    // Glow
+    float glow = smoothstep(0.5, 0.0, dist) * 0.5;
+
+    float alpha = (core + glow) * vAlpha;
+
+    // Fade distant particles slightly
+    float distFade = clamp(1.0 - vDist * 0.02, 0.3, 1.0);
+    alpha *= distFade;
+
+    if (alpha < 0.01) discard;
+
+    // Slight color variation in glow
+    vec3 finalColor = vColor * (core * 0.7 + 0.3) + vColor * glow * 0.5;
+
+    gl_FragColor = vec4(finalColor, alpha);
+  }
+`;
+
+const particleMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    uTime: { value: 0 },
+    uPointSize: { value: isMobile ? 25.0 : 35.0 },
+    uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
+    uColorA: { value: new THREE.Color() },
+    uColorB: { value: new THREE.Color() },
+    uColorC: { value: new THREE.Color() },
+    uMouse3D: { value: new THREE.Vector3(999, 999, 999) },
+    uMouseRadius: { value: CONFIG.mouseRadius },
+    uMouseStrength: { value: CONFIG.mouseStrength },
+    uTransition: { value: 0 }
+  },
+  vertexShader,
+  fragmentShader,
+  transparent: true,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+  depthTest: true
+});
+
+const particles = new THREE.Points(geometry, particleMaterial);
+scene.add(particles);
+
+// ─── CONNECTION LINES ───
+const linePositions = new Float32Array(CONFIG.maxConnections * 6);
+const lineColors = new Float32Array(CONFIG.maxConnections * 6);
+const lineGeometry = new THREE.BufferGeometry();
+lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+lineGeometry.setAttribute('color', new THREE.BufferAttribute(lineColors, 3));
+lineGeometry.setDrawRange(0, 0);
+
+const lineMaterial = new THREE.LineBasicMaterial({
+  vertexColors: true,
+  transparent: true,
+  opacity: 0.15,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false
+});
+
+const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+scene.add(lines);
+
+// ─── BACKGROUND STARS ───
+const starGeometry = new THREE.BufferGeometry();
+const starPositions = new Float32Array(CONFIG.bgStarCount * 3);
+const starSizes = new Float32Array(CONFIG.bgStarCount);
+
+for (let i = 0; i < CONFIG.bgStarCount; i++) {
+  const i3 = i * 3;
+  const r = 30 + Math.random() * 70;
+  const theta = Math.random() * Math.PI * 2;
+  const phi = Math.acos(2 * Math.random() - 1);
+  starPositions[i3] = r * Math.sin(phi) * Math.cos(theta);
+  starPositions[i3+1] = r * Math.sin(phi) * Math.sin(theta);
+  starPositions[i3+2] = r * Math.cos(phi);
+  starSizes[i] = Math.random();
+}
+
+starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+starGeometry.setAttribute('aSize', new THREE.BufferAttribute(starSizes, 1));
+
+const starVertexShader = `
+  attribute float aSize;
+  uniform float uTime;
+  varying float vAlpha;
+  void main() {
+    vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * mvPos;
+    float twinkle = sin(uTime * (aSize * 2.0 + 0.5) + aSize * 100.0) * 0.5 + 0.5;
+    gl_PointSize = (0.5 + aSize * 1.5) * (0.6 + twinkle * 0.4);
+    gl_PointSize *= (300.0 / -mvPos.z);
+    gl_PointSize = clamp(gl_PointSize, 0.5, 4.0);
+    vAlpha = 0.3 + twinkle * 0.5;
+  }
+`;
+
+const starFragmentShader = `
+  varying float vAlpha;
+  void main() {
+    float d = length(gl_PointCoord - 0.5);
+    float a = smoothstep(0.5, 0.0, d) * vAlpha;
+    gl_FragColor = vec4(0.7, 0.8, 1.0, a);
+  }
+`;
+
+const starMaterial = new THREE.ShaderMaterial({
+  uniforms: { uTime: { value: 0 } },
+  vertexShader: starVertexShader,
+  fragmentShader: starFragmentShader,
+  transparent: true,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false
+});
+
+const stars = new THREE.Points(starGeometry, starMaterial);
+scene.add(stars);
+
+// ─── DUST PARTICLES ───
+const dustCount = isMobile ? 300 : 800;
+const dustGeometry = new THREE.BufferGeometry();
+const dustPositions = new Float32Array(dustCount * 3);
+const dustVelocities = new Float32Array(dustCount * 3);
+
+for (let i = 0; i < dustCount; i++) {
+  const i3 = i * 3;
+  dustPositions[i3] = (Math.random()-0.5)*20;
+  dustPositions[i3+1] = (Math.random()-0.5)*20;
+  dustPositions[i3+2] = (Math.random()-0.5)*20;
+  dustVelocities[i3] = (Math.random()-0.5)*0.005;
+  dustVelocities[i3+1] = (Math.random()-0.5)*0.005;
+  dustVelocities[i3+2] = (Math.random()-0.5)*0.005;
+}
+
+dustGeometry.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
+const dustMaterial = new THREE.PointsMaterial({
+  size: 0.03,
+  color: 0x6366f1,
+  transparent: true,
+  opacity: 0.15,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+  sizeAttenuation: true
+});
+const dust = new THREE.Points(dustGeometry, dustMaterial);
+scene.add(dust);
+
+// ─── BURST SYSTEM ───
+const burstParticles = [];
+function createBurst(worldPos) {
+  const count = CONFIG.burstCount;
+  const positions = new Float32Array(count * 3);
+  const vels = [];
+  for (let i = 0; i < count; i++) {
+    const i3 = i * 3;
+    positions[i3] = worldPos.x;
+    positions[i3+1] = worldPos.y;
+    positions[i3+2] = worldPos.z;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2*Math.random()-1);
+    const speed = 0.5 + Math.random() * 2;
+    vels.push(
+      Math.sin(phi)*Math.cos(theta)*speed,
+      Math.sin(phi)*Math.sin(theta)*speed,
+      Math.cos(phi)*speed
+    );
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const mat = new THREE.PointsMaterial({
+    size: 0.08,
+    color: new THREE.Color().setRGB(...getCurrentColors().a),
+    transparent: true,
+    opacity: 1,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    sizeAttenuation: true
+  });
+  const pts = new THREE.Points(geo, mat);
+  scene.add(pts);
+  burstParticles.push({ pts, vels, life: 1.0, positions });
+}
+
+// ─── MOUSE INTERACTION ───
+const mouse = new THREE.Vector2(999, 999);
+const mouse3D = new THREE.Vector3(999, 999, 999);
+const raycaster = new THREE.Raycaster();
+const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+
+function updateMouse(x, y) {
+  mouse.x = (x / window.innerWidth) * 2 - 1;
+  mouse.y = -(y / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const target = new THREE.Vector3();
+  raycaster.ray.intersectPlane(plane, target);
+  if (target) mouse3D.copy(target);
+}
+
+window.addEventListener('mousemove', (e) => updateMouse(e.clientX, e.clientY));
+window.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: false });
+
+function handleClick(x, y) {
+  updateMouse(x, y);
+  createBurst(mouse3D.clone());
+}
+
+window.addEventListener('click', (e) => {
+  if (e.target.closest('#ui')) return;
+  handleClick(e.clientX, e.clientY);
+});
+window.addEventListener('touchstart', (e) => {
+  if (e.target.closest('#ui')) return;
+  handleClick(e.touches[0].clientX, e.touches[0].clientY);
+});
+
+// ─── AUDIO ───
+let audioCtx = null;
+let audioEnabled = false;
+let oscillators = [];
+let gainNode = null;
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  gainNode = audioCtx.createGain();
+  gainNode.gain.value = 0;
+  gainNode.connect(audioCtx.destination);
+
+  const notes = [110, 146.83, 164.81, 220, 293.66, 329.63];
+  notes.forEach((freq, i) => {
+    const osc = audioCtx.createOscillator();
+    osc.type = i < 3 ? 'sine' : 'triangle';
+    osc.frequency.value = freq;
+    const oscGain = audioCtx.createGain();
+    oscGain.gain.value = i < 3 ? 0.06 : 0.02;
+    osc.connect(oscGain);
+    oscGain.connect(gainNode);
+
+    // LFO for subtle modulation
+    const lfo = audioCtx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 0.1 + i * 0.05;
+    const lfoGain = audioCtx.createGain();
+    lfoGain.gain.value = freq * 0.005;
+    lfo.connect(lfoGain);
+    lfoGain.connect(osc.frequency);
+    lfo.start();
+    osc.start();
+    oscillators.push({ osc, lfo, oscGain });
+  });
+}
+
+function toggleAudio() {
+  if (!audioCtx) initAudio();
+  audioEnabled = !audioEnabled;
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  gainNode.gain.linearRampToValueAtTime(audioEnabled ? 0.5 : 0, audioCtx.currentTime + 0.5);
+  document.getElementById('btn-sound').classList.toggle('active', audioEnabled);
+}
+
+// ─── MODE SWITCHING ───
+let currentMode = 'galaxy';
+let transitioning = false;
+
+function switchMode(mode) {
+  if (mode === currentMode && !transitioning) return;
+  currentMode = mode;
+  transitioning = true;
+
+  const newPositions = formations[mode](COUNT);
+  targetPositions.set(newPositions);
+
+  // Update UI
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  document.getElementById('s-mode').textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+}
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+});
+
+// ─── UI BUTTONS ───
+document.getElementById('btn-sound').addEventListener('click', toggleAudio);
+
+let autoOrbit = true;
+document.getElementById('btn-orbit').addEventListener('click', () => {
+  autoOrbit = !autoOrbit;
+  controls.autoRotate = autoOrbit;
+  document.getElementById('btn-orbit').classList.toggle('active', autoOrbit);
+});
+document.getElementById('btn-orbit').classList.add('active');
+
+document.getElementById('btn-burst').addEventListener('click', () => {
+  createBurst(new THREE.Vector3((Math.random()-0.5)*4, (Math.random()-0.5)*4, (Math.random()-0.5)*4));
+});
+
+// ─── LOADING ───
+let loaded = false;
+const loaderBar = document.getElementById('loaderBar');
+loaderBar.style.width = '100%';
+setTimeout(() => {
+  document.getElementById('loader').classList.add('hide');
+  loaded = true;
+}, 1200);
+
+// ─── ANIMATION LOOP ───
+const clock = new THREE.Clock();
+let frameCount = 0;
+let lastFPSTime = 0;
+let fps = 0;
+
+function updateConnections() {
+  const posArr = geometry.attributes.position.array;
+  let lineIdx = 0;
+  const maxCheck = Math.min(COUNT, 500);
+  const colorsArr = getCurrentColors();
+
+  for (let i = 0; i < maxCheck && lineIdx < CONFIG.maxConnections; i++) {
+    const i3 = i * 3;
+    for (let j = i + 1; j < maxCheck && lineIdx < CONFIG.maxConnections; j++) {
+      const j3 = j * 3;
+      const dx = posArr[i3] - posArr[j3];
+      const dy = posArr[i3+1] - posArr[j3+1];
+      const dz = posArr[i3+2] - posArr[j3+2];
+      const dist = dx*dx + dy*dy + dz*dz;
+      const maxD = CONFIG.connectionDistance * CONFIG.connectionDistance;
+      if (dist < maxD) {
+        const li = lineIdx * 6;
+        linePositions[li] = posArr[i3];
+        linePositions[li+1] = posArr[i3+1];
+        linePositions[li+2] = posArr[i3+2];
+        linePositions[li+3] = posArr[j3];
+        linePositions[li+4] = posArr[j3+1];
+        linePositions[li+5] = posArr[j3+2];
+
+        const alpha = 1.0 - Math.sqrt(dist) / CONFIG.connectionDistance;
+        const c = colorsArr.a;
+        lineColors[li] = c[0]*alpha;
+        lineColors[li+1] = c[1]*alpha;
+        lineColors[li+2] = c[2]*alpha;
+        lineColors[li+3] = c[0]*alpha;
+        lineColors[li+4] = c[1]*alpha;
+        lineColors[li+5] = c[2]*alpha;
+        lineIdx++;
+      }
+    }
+  }
+  lineGeometry.setDrawRange(0, lineIdx * 2);
+  lineGeometry.attributes.position.needsUpdate = true;
+  lineGeometry.attributes.color.needsUpdate = true;
+  document.getElementById('s-links').textContent = lineIdx;
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  if (!loaded) return;
+
+  const delta = clock.getDelta();
+  const elapsed = clock.getElapsedTime();
+
+  // FPS counter
+  frameCount++;
+  if (elapsed - lastFPSTime >= 0.5) {
+    fps = Math.round(frameCount / (elapsed - lastFPSTime));
+    document.getElementById('s-fps').textContent = fps;
+    frameCount = 0;
+    lastFPSTime = elapsed;
+  }
+  document.getElementById('s-nodes').textContent = COUNT;
+
+  // Color cycling
+  paletteT += CONFIG.colorCycleSpeed;
+  if (paletteT >= 1) {
+    paletteT = 0;
+    currentPalette = (currentPalette + 1) % PALETTES.length;
+  }
+  const colors = getCurrentColors();
+  particleMaterial.uniforms.uColorA.value.setRGB(colors.a[0], colors.a[1], colors.a[2]);
+  particleMaterial.uniforms.uColorB.value.setRGB(colors.b[0], colors.b[1], colors.b[2]);
+  particleMaterial.uniforms.uColorC.value.setRGB(colors.c[0], colors.c[1], colors.c[2]);
+  scene.background = new THREE.Color().setRGB(colors.bg[0], colors.bg[1], colors.bg[2]);
+
+  // Update particle positions (smooth transition)
+  const posArr = geometry.attributes.position.array;
+  const speed = CONFIG.transitionSpeed;
+  let maxDelta = 0;
+  for (let i = 0; i < COUNT * 3; i++) {
+    const diff = targetPositions[i] - posArr[i];
+    posArr[i] += diff * speed * (1 + Math.abs(diff) * 0.5);
+    maxDelta = Math.max(maxDelta, Math.abs(diff));
+  }
+  if (maxDelta < 0.01) transitioning = false;
+  geometry.attributes.position.needsUpdate = true;
+
+  // Mode-specific animation on targets
+  const tgt = targetPositions;
+  if (currentMode === 'wave') {
+    const gridSize = Math.ceil(Math.sqrt(COUNT));
+    const spacing = 10 / gridSize;
+    for (let i = 0; i < COUNT; i++) {
+      const i3 = i * 3;
+      const gx = (i % gridSize) * spacing - 5;
+      const gz = Math.floor(i / gridSize) * spacing - 5;
+      const dist = Math.sqrt(gx*gx + gz*gz);
+      tgt[i3+1] = Math.sin(dist * 1.5 - elapsed * 1.5) * Math.cos(gx * 0.5 + elapsed * 0.3) * 1.2;
+    }
+  } else if (currentMode === 'dna') {
+    const length = 12;
+    for (let i = 0; i < COUNT; i++) {
+      const i3 = i * 3;
+      const t = (i / COUNT) * length - length / 2;
+      const strand = i % 3;
+      const spin = elapsed * 0.5;
+      if (strand < 2) {
+        const angle = t * 1.2 + (strand === 0 ? 0 : Math.PI) + spin;
+        tgt[i3] = Math.cos(angle) * 1.5;
+        tgt[i3+2] = Math.sin(angle) * 1.5;
+      }
+    }
+  } else if (currentMode === 'galaxy') {
+    particles.rotation.y = elapsed * 0.05;
+  } else {
+    particles.rotation.y *= 0.99;
+  }
+
+  // Update uniforms
+  particleMaterial.uniforms.uTime.value = elapsed;
+  particleMaterial.uniforms.uMouse3D.value.copy(mouse3D);
+  starMaterial.uniforms.uTime.value = elapsed;
+
+  // Update dust
+  const dpos = dustGeometry.attributes.position.array;
+  for (let i = 0; i < dustCount * 3; i++) {
+    dpos[i] += dustVelocities[i];
+    if (Math.abs(dpos[i]) > 10) dustVelocities[i] *= -1;
+  }
+  dustGeometry.attributes.position.needsUpdate = true;
+  dustMaterial.color.setRGB(colors.a[0]*0.5, colors.a[1]*0.5, colors.a[2]*0.5);
+
+  // Update bursts
+  for (let b = burstParticles.length - 1; b >= 0; b--) {
+    const burst = burstParticles[b];
+    burst.life -= delta * 1.2;
+    if (burst.life <= 0) {
+      scene.remove(burst.pts);
+      burst.pts.geometry.dispose();
+      burst.pts.material.dispose();
+      burstParticles.splice(b, 1);
+      continue;
+    }
+    const bpos = burst.pts.geometry.attributes.position.array;
+    const bCount = bpos.length / 3;
+    for (let i = 0; i < bCount; i++) {
+      const i3 = i * 3;
+      bpos[i3] += burst.vels[i3] * delta;
+      bpos[i3+1] += burst.vels[i3+1] * delta;
+      bpos[i3+2] += burst.vels[i3+2] * delta;
+      burst.vels[i3] *= 0.97;
+      burst.vels[i3+1] *= 0.97;
+      burst.vels[i3+2] *= 0.97;
+    }
+    burst.pts.geometry.attributes.position.needsUpdate = true;
+    burst.pts.material.opacity = burst.life;
+    burst.pts.material.color.setRGB(
+      colors.a[0] * burst.life + colors.b[0] * (1-burst.life),
+      colors.a[1] * burst.life + colors.b[1] * (1-burst.life),
+      colors.a[2] * burst.life + colors.b[2] * (1-burst.life)
+    );
+  }
+
+  // Update connections every few frames
+  if (frameCount % 3 === 0) updateConnections();
+
+  // Update audio based on mode
+  if (audioEnabled && audioCtx && oscillators.length > 0) {
+    const modeFreqs = {
+      galaxy: [110, 146.83, 164.81, 220, 293.66, 329.63],
+      dna: [130.81, 164.81, 196, 261.63, 329.63, 392],
+      neural: [146.83, 185, 220, 293.66, 369.99, 440],
+      wave: [98, 130.81, 196, 261.63, 392, 523.25],
+      nebula: [82.41, 110, 146.83, 196, 261.63, 349.23]
+    };
+    const freqs = modeFreqs[currentMode] || modeFreqs.galaxy;
+    oscillators.forEach((o, i) => {
+      o.osc.frequency.linearRampToValueAtTime(freqs[i], audioCtx.currentTime + 2);
+    });
+  }
+
+  controls.update();
+  composer.render();
+}
+
+animate();
+
+// ─── RESIZE ───
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
+  particleMaterial.uniforms.uPixelRatio.value = Math.min(window.devicePixelRatio, 2);
+});
+
+// ─── KEYBOARD SHORTCUTS ───
+window.addEventListener('keydown', (e) => {
+  const modes = ['galaxy', 'dna', 'neural', 'wave', 'nebula'];
+  const num = parseInt(e.key);
+  if (num >= 1 && num <= 5) switchMode(modes[num - 1]);
+  if (e.key === 's' || e.key === 'S') toggleAudio();
+  if (e.key === 'o' || e.key === 'O') {
+    autoOrbit = !autoOrbit;
+    controls.autoRotate = autoOrbit;
+    document.getElementById('btn-orbit').classList.toggle('active', autoOrbit);
+  }
+  if (e.key === ' ') {
+    e.preventDefault();
+    createBurst(new THREE.Vector3((Math.random()-0.5)*4, (Math.random()-0.5)*4, (Math.random()-0.5)*4));
+  }
+});
+
+console.log('%c OneWave AI — Neural Cosmos ', 'background: linear-gradient(135deg, #6366f1, #a78bfa); color: white; font-size: 14px; padding: 8px 16px; border-radius: 8px;');
 </script>
 </body>
 </html>
