@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>South Florida Weekend Getaway — March 21-22, 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,400&display=swap');
+
+  :root {
+    --bg-primary: #0a0e1a;
+    --bg-secondary: #111827;
+    --bg-card: rgba(255,255,255,0.04);
+    --bg-glass: rgba(255,255,255,0.06);
+    --bg-glass-hover: rgba(255,255,255,0.10);
+    --border-glass: rgba(255,255,255,0.08);
+    --border-glass-bright: rgba(255,255,255,0.15);
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-blue: #38bdf8;
+    --accent-teal: #2dd4bf;
+    --accent-purple: #a78bfa;
+    --accent-orange: #fb923c;
+    --accent-pink: #f472b6;
+    --accent-green: #4ade80;
+    --gradient-keys: linear-gradient(135deg, #0ea5e9, #06b6d4);
+    --gradient-naples: linear-gradient(135deg, #f97316, #eab308);
+    --gradient-local: linear-gradient(135deg, #8b5cf6, #ec4899);
+    --shadow-glow: 0 0 60px rgba(56,189,248,0.08);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* Animated Background */
+  .bg-animation {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0; overflow: hidden; pointer-events: none;
+  }
+  .bg-orb {
+    position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15;
+    animation: orbFloat 20s ease-in-out infinite;
+  }
+  .bg-orb:nth-child(1) { width: 600px; height: 600px; background: #0ea5e9; top: -200px; left: -100px; animation-delay: 0s; }
+  .bg-orb:nth-child(2) { width: 500px; height: 500px; background: #8b5cf6; bottom: -150px; right: -100px; animation-delay: -7s; }
+  .bg-orb:nth-child(3) { width: 400px; height: 400px; background: #06b6d4; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -14s; }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.05); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    max-width: 1200px; margin: 0 auto; padding: 20px;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center; padding: 60px 20px 40px;
+    animation: fadeInUp 0.8s ease-out;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.2);
+    padding: 8px 18px; border-radius: 100px; font-size: 13px; font-weight: 500;
+    color: var(--accent-blue); margin-bottom: 20px; letter-spacing: 0.5px;
+  }
+  .hero-badge .pulse { width: 8px; height: 8px; background: var(--accent-teal); border-radius: 50%; animation: pulse 2s infinite; }
+  .hero h1 {
+    font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 700; line-height: 1.15;
+    background: linear-gradient(135deg, #f1f5f9 0%, #38bdf8 50%, #2dd4bf 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 12px;
+  }
+  .hero .subtitle {
+    font-size: clamp(1rem, 2vw, 1.2rem); color: var(--text-secondary);
+    font-weight: 300; max-width: 550px; margin: 0 auto;
+  }
+  .hero .dates {
+    display: inline-flex; align-items: center; gap: 10px;
+    margin-top: 24px; padding: 12px 24px; border-radius: 12px;
+    background: var(--bg-glass); border: 1px solid var(--border-glass);
+    font-size: 15px; color: var(--text-secondary);
+  }
+  .hero .dates svg { width: 18px; height: 18px; stroke: var(--accent-blue); fill: none; }
+
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* Tab Navigation */
+  .tab-nav {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+    margin: 10px 0 30px; animation: fadeInUp 0.8s ease-out 0.2s both;
+  }
+  .tab-btn {
+    position: relative; display: flex; align-items: center; gap: 10px;
+    padding: 14px 24px; border: 1px solid var(--border-glass);
+    border-radius: 14px; background: var(--bg-glass);
+    color: var(--text-secondary); font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    font-family: inherit; outline: none;
+  }
+  .tab-btn:hover { background: var(--bg-glass-hover); border-color: var(--border-glass-bright); color: var(--text-primary); transform: translateY(-2px); }
+  .tab-btn.active { color: #fff; border-color: transparent; box-shadow: 0 8px 32px rgba(0,0,0,0.3); transform: translateY(-2px); }
+  .tab-btn[data-tab="keys"].active { background: var(--gradient-keys); }
+  .tab-btn[data-tab="naples"].active { background: var(--gradient-naples); }
+  .tab-btn[data-tab="local"].active { background: var(--gradient-local); }
+  .tab-btn .rec-badge {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 6px;
+    letter-spacing: 0.5px;
+  }
+  .tab-btn .tab-icon { font-size: 20px; }
+
+  /* Tab Content */
+  .tab-content { display: none; animation: fadeIn 0.5s ease-out; }
+  .tab-content.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Quick Stats Bar */
+  .stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;
+    margin-bottom: 30px;
+  }
+  .stat-card {
+    background: var(--bg-glass); border: 1px solid var(--border-glass);
+    border-radius: var(--radius-sm); padding: 16px; text-align: center;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  }
+  .stat-card .stat-icon { font-size: 22px; margin-bottom: 6px; }
+  .stat-card .stat-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+  .stat-card .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+  /* Glass Card */
+  .glass-card {
+    background: var(--bg-glass); border: 1px solid var(--border-glass);
+    border-radius: var(--radius); padding: 0;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    margin-bottom: 20px; overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .glass-card:hover { border-color: var(--border-glass-bright); }
+
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px; cursor: pointer; user-select: none;
+    transition: background 0.2s;
+  }
+  .card-header:hover { background: rgba(255,255,255,0.02); }
+  .card-header-left { display: flex; align-items: center; gap: 14px; }
+  .card-header .icon-circle {
+    width: 42px; height: 42px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .card-header h3 { font-size: 16px; font-weight: 600; }
+  .card-header .card-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .card-header .chevron {
+    width: 20px; height: 20px; stroke: var(--text-muted);
+    transition: transform 0.3s ease; fill: none;
+  }
+  .glass-card.open .card-header .chevron { transform: rotate(180deg); }
+
+  .card-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .glass-card.open .card-body { max-height: 2000px; }
+  .card-body-inner { padding: 0 24px 24px; }
+
+  /* Itinerary Timeline */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px;
+    width: 2px; background: linear-gradient(to bottom, var(--accent-blue), var(--accent-teal));
+    border-radius: 2px; opacity: 0.3;
+  }
+  .timeline-item { position: relative; margin-bottom: 20px; }
+  .timeline-item:last-child { margin-bottom: 0; }
+  .timeline-item::before {
+    content: ''; position: absolute; left: -24px; top: 6px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--accent-blue); border: 2px solid var(--bg-primary);
+    box-shadow: 0 0 10px rgba(56,189,248,0.4);
+  }
+  .timeline-time { font-size: 12px; font-weight: 600; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 0.5px; }
+  .timeline-title { font-size: 15px; font-weight: 600; margin: 4px 0 2px; }
+  .timeline-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+  /* Location Cards */
+  .location-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  .location-item {
+    display: flex; gap: 14px; padding: 14px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius-sm); transition: all 0.2s;
+  }
+  .location-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
+  .location-item .loc-icon { font-size: 28px; flex-shrink: 0; width: 40px; text-align: center; padding-top: 2px; }
+  .location-item .loc-info { flex: 1; }
+  .location-item .loc-name { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .location-item .loc-detail { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+  .location-item .loc-tag {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 3px 8px; border-radius: 6px; margin-top: 6px;
+    text-transform: uppercase; letter-spacing: 0.3px;
+  }
+  .tag-good { background: rgba(74,222,128,0.15); color: var(--accent-green); }
+  .tag-warn { background: rgba(251,146,60,0.15); color: var(--accent-orange); }
+  .tag-info { background: rgba(56,189,248,0.15); color: var(--accent-blue); }
+
+  /* Link Buttons */
+  .link-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px; border-radius: 10px;
+    font-size: 13px; font-weight: 500;
+    text-decoration: none; transition: all 0.3s;
+    border: 1px solid var(--border-glass);
+    background: var(--bg-glass); color: var(--text-primary);
+  }
+  .link-btn:hover { background: var(--bg-glass-hover); transform: translateY(-1px); border-color: var(--border-glass-bright); }
+  .link-btn.primary { background: var(--gradient-keys); border-color: transparent; color: #fff; }
+  .link-btn.primary:hover { box-shadow: 0 4px 20px rgba(14,165,233,0.3); }
+  .link-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; }
+  .links-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+  /* Restaurant List */
+  .resto-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: var(--radius-sm);
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 8px; transition: all 0.2s;
+  }
+  .resto-item:hover { background: rgba(255,255,255,0.05); }
+  .resto-item:last-child { margin-bottom: 0; }
+  .resto-icon { font-size: 24px; width: 36px; text-align: center; }
+  .resto-name { font-size: 14px; font-weight: 600; }
+  .resto-type { font-size: 12px; color: var(--text-muted); }
+
+  /* Cost Comparison */
+  .cost-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  .cost-card {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius-sm); padding: 18px; text-align: center;
+  }
+  .cost-card .cost-dest { font-size: 13px; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .cost-line { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .cost-line:last-of-type { border-bottom: none; }
+  .cost-total { display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; padding-top: 10px; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+  /* Packing Checklist */
+  .checklist { columns: 2; column-gap: 20px; }
+  .check-category { break-inside: avoid; margin-bottom: 18px; }
+  .check-category h4 { font-size: 13px; font-weight: 600; color: var(--accent-blue); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .check-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 0; font-size: 13px; color: var(--text-secondary);
+    cursor: pointer; user-select: none; transition: color 0.2s;
+  }
+  .check-item:hover { color: var(--text-primary); }
+  .check-box {
+    width: 20px; height: 20px; border: 2px solid var(--border-glass-bright);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .check-item.checked .check-box {
+    background: var(--accent-teal); border-color: var(--accent-teal);
+  }
+  .check-item.checked .check-box::after {
+    content: '✓'; color: var(--bg-primary); font-size: 12px; font-weight: 700;
+  }
+  .check-item.checked { color: var(--text-muted); text-decoration: line-through; }
+
+  /* Weather Widget */
+  .weather-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .weather-day {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius-sm); padding: 18px; text-align: center;
+  }
+  .weather-day .day-name { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .weather-day .weather-icon { font-size: 42px; margin: 8px 0; }
+  .weather-day .temp-high { font-size: 28px; font-weight: 700; }
+  .weather-day .temp-low { font-size: 14px; color: var(--text-muted); }
+  .weather-day .weather-detail { font-size: 12px; color: var(--text-secondary); margin-top: 8px; }
+
+  /* Branding */
+  .branding {
+    text-align: center; padding: 50px 20px 30px;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .branding a { color: var(--accent-blue); text-decoration: none; }
+  .branding .brand-logo {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-weight: 600; font-size: 13px; color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .branding .brand-logo .wave { color: var(--accent-blue); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .container { padding: 12px; }
+    .hero { padding: 40px 12px 30px; }
+    .tab-nav { gap: 8px; }
+    .tab-btn { padding: 12px 16px; font-size: 13px; }
+    .tab-btn .rec-badge { display: none; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .checklist { columns: 1; }
+    .weather-row { grid-template-columns: 1fr 1fr; }
+    .cost-grid { grid-template-columns: 1fr; }
+    .card-header { padding: 16px 18px; }
+    .card-body-inner { padding: 0 18px 18px; }
+  }
+  @media (max-width: 480px) {
+    .tab-nav { flex-direction: column; align-items: stretch; }
+    .tab-btn { justify-content: center; }
+  }
+
+  /* Section Header inside cards */
+  .section-title {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--text-muted); margin: 20px 0 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title:first-child { margin-top: 0; }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(to right, var(--border-glass), transparent);
+  }
+
+  /* Pro/Con tags */
+  .pro-con { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+  .pro-tag, .con-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 500;
+  }
+  .pro-tag { background: rgba(74,222,128,0.1); color: var(--accent-green); border: 1px solid rgba(74,222,128,0.15); }
+  .con-tag { background: rgba(251,146,60,0.1); color: var(--accent-orange); border: 1px solid rgba(251,146,60,0.15); }
+</style>
+</head>
+<body>
+
+<div class="bg-animation">
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+</div>
+
+<div class="container">
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-badge"><span class="pulse"></span> Weekend Trip Planner</div>
+    <h1>South Florida Getaway</h1>
+    <p class="subtitle">A curated weekend for two — jet skis, kayaking, great food, and adventure.</p>
+    <div class="dates">
+      <svg viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Saturday, March 21 — Sunday, March 22, 2026
+    </div>
+  </header>
+
+  <!-- Tab Navigation -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="keys" onclick="switchTab('keys')">
+      <span class="tab-icon">🏝️</span> Islamorada <span class="rec-badge">Recommended</span>
+    </button>
+    <button class="tab-btn" data-tab="naples" onclick="switchTab('naples')">
+      <span class="tab-icon">🐚</span> Naples / Marco Island
+    </button>
+    <button class="tab-btn" data-tab="local" onclick="switchTab('local')">
+      <span class="tab-icon">🏠</span> Stay Local
+    </button>
+  </nav>
+
+  <!-- ==================== ISLAMORADA ==================== -->
+  <div class="tab-content active" id="tab-keys">
+
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-icon">🚗</div><div class="stat-value">~2.5 hrs</div><div class="stat-label">Drive Time</div></div>
+      <div class="stat-card"><div class="stat-icon">🌡️</div><div class="stat-value">79–81°F</div><div class="stat-label">Highs</div></div>
+      <div class="stat-card"><div class="stat-icon">💨</div><div class="stat-value">NE 10-15kt</div><div class="stat-label">Wind</div></div>
+      <div class="stat-card"><div class="stat-icon">🌊</div><div class="stat-value">Light Chop</div><div class="stat-label">Conditions</div></div>
+      <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-value">~$550</div><div class="stat-label">Est. Total</div></div>
+    </div>
+
+    <!-- Weather -->
+    <div class="glass-card open">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(56,189,248,0.12)">☀️</div>
+          <div><h3>Weather Forecast</h3><div class="card-subtitle">Islamorada, FL — March 21-22</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="weather-row">
+          <div class="weather-day">
+            <div class="day-name">Saturday, Mar 21</div>
+            <div class="weather-icon">⛅</div>
+            <div class="temp-high">81°F</div>
+            <div class="temp-low">Low 66°F</div>
+            <div class="weather-detail">NE winds 10-15 kt · Light chop on the bay · UV Index: High</div>
+          </div>
+          <div class="weather-day">
+            <div class="day-name">Sunday, Mar 22</div>
+            <div class="weather-icon">🌤️</div>
+            <div class="temp-high">79°F</div>
+            <div class="temp-low">Low 64°F</div>
+            <div class="weather-detail">NE winds 10-12 kt · Mostly sunny · Perfect for paddling</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Day 1 Itinerary -->
+    <div class="glass-card open">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(14,165,233,0.12)">📅</div>
+          <div><h3>Day 1 — Saturday, March 21</h3><div class="card-subtitle">Drive down, launch jet ski, sunset vibes</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-time">7:00 AM</div>
+            <div class="timeline-title">Hit the Road</div>
+            <div class="timeline-desc">Load up the jet ski trailer, grab coffee, and head south on the Turnpike → US-1. Enjoy the iconic Overseas Highway drive across the bridges.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">9:30 AM</div>
+            <div class="timeline-title">Arrive & Check In</div>
+            <div class="timeline-desc">Drop bags at your Airbnb. Most places allow early drop-off by 10am. Unload and get settled.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">10:30 AM</div>
+            <div class="timeline-title">🚤 Launch the Jet Ski</div>
+            <div class="timeline-desc">Head to Harry Harris Park (MM 92.5). Launch fee is $25 non-resident each way. Ride out to the turquoise flats — explore shallow sandbars, hit Indian Key, and cruise the bayside channels.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">1:00 PM</div>
+            <div class="timeline-title">Lunch at Lazy Days</div>
+            <div class="timeline-desc">Oceanfront dining with fresh-catch fish tacos and cold drinks. Right on the water in Islamorada.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">2:30 PM</div>
+            <div class="timeline-title">🛶 Kayak the Mangroves</div>
+            <div class="timeline-desc">Paddle through the iconic mangrove tunnels. Crystal-clear shallow water, spotted eagle rays, small sharks, and total serenity. Rent kayaks locally or bring your own.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">5:00 PM</div>
+            <div class="timeline-title">Robbie's Marina — Tarpon Feeding</div>
+            <div class="timeline-desc">Stop at the legendary Robbie's to hand-feed massive tarpon off the dock. Grab a drink at the Hungry Tarpon bar. Great photo ops.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">6:30 PM</div>
+            <div class="timeline-title">🍽️ Dinner at Morada Bay Beach Café</div>
+            <div class="timeline-desc">Tables in the sand, tiki torches, live music. One of the most romantic restaurants in the Keys. Fresh seafood and craft cocktails as the sun goes down.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">8:30 PM</div>
+            <div class="timeline-title">Stargazing & Nightcap</div>
+            <div class="timeline-desc">The Keys have some of the darkest skies in South Florida. Grab a drink and walk the beach or relax on your Airbnb deck.</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Day 2 Itinerary -->
+    <div class="glass-card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(45,212,191,0.12)">📅</div>
+          <div><h3>Day 2 — Sunday, March 22</h3><div class="card-subtitle">Snorkel the reef, brunch, head home</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-time">8:00 AM</div>
+            <div class="timeline-title">Sunrise Paddle</div>
+            <div class="timeline-desc">Early morning kayak while the water is glass-calm. Best conditions for spotting stingrays, nurse sharks, and sea turtles in the shallows.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">9:30 AM</div>
+            <div class="timeline-title">Brunch at Fish House Encore</div>
+            <div class="timeline-desc">Famous Key Largo spot. Try the lobster Benedict or the hogfish — locally caught, absolutely incredible.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">11:00 AM</div>
+            <div class="timeline-title">🤿 Snorkel the Coral Reef</div>
+            <div class="timeline-desc">Book a Fury Cat or John Pennekamp tour to snorkel North America's only living coral reef. Incredible visibility, tropical fish, and maybe a sea turtle sighting.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">1:30 PM</div>
+            <div class="timeline-title">Last Jet Ski Ride & Pull Out</div>
+            <div class="timeline-desc">One more rip across the flats before hauling out. Take the scenic route past the sandbars.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">3:00 PM</div>
+            <div class="timeline-title">Pack Up & Head Home</div>
+            <div class="timeline-desc">Scenic drive back up US-1. Should arrive in Coconut Creek by ~5:30 PM with time to unload and rest up for the week.</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Jet Ski Launches -->
+    <div class="glass-card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(251,146,60,0.12)">🚤</div>
+          <div><h3>Jet Ski Launch Ramps</h3><div class="card-subtitle">4 options in the Upper Keys</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="location-grid">
+          <div class="location-item">
+            <div class="loc-icon">🏖️</div>
+            <div class="loc-info">
+              <div class="loc-name">Harry Harris Park</div>
+              <div class="loc-detail">MM 92.5, Islamorada. Paved ramp, good parking. Non-resident fee: $25 per launch.</div>
+              <span class="loc-tag tag-good">Best Option</span>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="loc-icon">⚓</div>
+            <div class="loc-info">
+              <div class="loc-name">Plantation Yacht Harbor Marina</div>
+              <div class="loc-detail">Founders Park, MM 87. 1 unpaved ramp. Closes at 6 PM — plan your pullout accordingly.</div>
+              <span class="loc-tag tag-warn">Closes 6 PM</span>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="loc-icon">🌴</div>
+            <div class="loc-info">
+              <div class="loc-name">Indian Key Fill</div>
+              <div class="loc-detail">US-1, 2 unpaved lanes, ~20 parking spots. Was temporarily closed — verify status before going.</div>
+              <span class="loc-tag tag-warn">Check Status</span>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="loc-icon">🐠</div>
+            <div class="loc-info">
+              <div class="loc-name">John Pennekamp State Park</div>
+              <div class="loc-detail">MM 102.5, Key Largo. Full-service park with ramps, rentals, and snorkel tours on-site.</div>
+              <span class="loc-tag tag-info">Key Largo</span>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Couples Activities -->
+    <div class="glass-card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(244,114,182,0.12)">💕</div>
+          <div><h3>Couples Activities</h3><div class="card-subtitle">Beyond jet skis and kayaks</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="location-grid">
+          <div class="location-item">
+            <div class="loc-icon">🚤</div>
+            <div class="loc-info">
+              <div class="loc-name">Robbie's Marina Jet Ski Tours</div>
+              <div class="loc-detail">Guided 14-20 mile tours through turquoise waters. Explore mangrove islands and sandbars together.</div>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="loc-icon">⛵</div>
+            <div class="loc-info">
+              <div class="loc-name">Sunset Schooner Cruise</div>
+              <div class="loc-detail">90-120 min on a historic sailing schooner. Wine, appetizers, and golden-hour views over the Gulf.</div>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="loc-icon">🤿</div>
+            <div class="loc-info">
+              <div class="loc-name">Coral Reef Snorkeling (Fury Cats)</div>
+              <div class="loc-detail">North America's only living coral reef. Professional catamaran tours with gear provided.</div>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="loc-icon">🏖️</div>
+            <div class="loc-info">
+              <div class="loc-name">Sandbar Charter to Boca Chica</div>
+              <div class="loc-detail">Private-ish sandbar with paddleboards, kayaks, and lunch included. Total tropical vibes.</div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Dining -->
+    <div class="glass-card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(167,139,250,0.12)">🍽️</div>
+          <div><h3>Dining</h3><div class="card-subtitle">Top restaurants in the Keys</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="resto-item"><div class="resto-icon">🐟</div><div><div class="resto-name">Fish House Encore</div><div class="resto-type">Seafood · Key Largo · Famous hogfish & lobster</div></div></div>
+        <div class="resto-item"><div class="resto-icon">🌅</div><div><div class="resto-name">Morada Bay Beach Café</div><div class="resto-type">Beach dining · Live music · Tiki torches in the sand</div></div></div>
+        <div class="resto-item"><div class="resto-icon">🦞</div><div><div class="resto-name">Lazy Days Restaurant</div><div class="resto-type">Oceanfront · Fresh catch · Casual-upscale vibe</div></div></div>
+      </div></div>
+    </div>
+
+    <!-- Airbnb -->
+    <div class="glass-card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(56,189,248,0.12)">🏡</div>
+          <div><h3>Book Your Stay</h3><div class="card-subtitle">Airbnb search pre-loaded for your dates</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:14px;">Pre-filtered for 2 adults, March 21-23 checkout. Look for places with boat/trailer parking!</p>
+        <div class="links-row">
+          <a href="https://www.airbnb.com/s/Islamorada%2C%20Florida%20Keys/homes?checkin=2026-03-21&checkout=2026-03-23&adults=2" target="_blank" class="link-btn primary">
+            <svg viewBox="0 0 24 24" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Search Islamorada Airbnbs
+          </a>
+          <a href="https://maps.google.com/?q=Islamorada+FL" target="_blank" class="link-btn">
+            <svg viewBox="0 0 24 24" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            View on Google Maps
+          </a>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- ==================== NAPLES ==================== -->
+  <div class="tab-content" id="tab-naples">
+
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-icon">🚗</div><div class="stat-value">~2 hrs</div><div class="stat-label">Drive Time</div></div>
+      <div class="stat-card"><div class="stat-icon">🌡️</div><div class="stat-value">79–81°F</div><div class="stat-label">Highs</div></div>
+      <div class="stat-card"><div class="stat-icon">💨</div><div class="stat-value">Calm</div><div class="stat-label">Gulf Waters</div></div>
+      <div class="stat-card"><div class="stat-icon">🐚</div><div class="stat-value">Flat</div><div class="stat-label">Conditions</div></div>
+      <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-value">~$500</div><div class="stat-label">Est. Total</div></div>
+    </div>
+
+    <!-- Weather -->
+    <div class="glass-card open">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(249,115,22,0.12)">☀️</div>
+          <div><h3>Weather Forecast</h3><div class="card-subtitle">Naples / Marco Island — March 21-22</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="weather-row">
+          <div class="weather-day">
+            <div class="day-name">Saturday, Mar 21</div>
+            <div class="weather-icon">☀️</div>
+            <div class="temp-high">81°F</div>
+            <div class="temp-low">Low 65°F</div>
+            <div class="weather-detail">Calm Gulf waters · Minimal wind · Perfect jet ski conditions</div>
+          </div>
+          <div class="weather-day">
+            <div class="day-name">Sunday, Mar 22</div>
+            <div class="weather-icon">🌤️</div>
+            <div class="temp-high">79°F</div>
+            <div class="temp-low">Low 64°F</div>
+            <div class="weather-detail">Light breeze · Glass-calm morning · Great kayaking weather</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Day 1 -->
+    <div class="glass-card open">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(249,115,22,0.12)">📅</div>
+          <div><h3>Day 1 — Saturday, March 21</h3><div class="card-subtitle">Gulf Coast jet skiing & mangrove exploration</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-time">7:30 AM</div>
+            <div class="timeline-title">Head West on Alligator Alley</div>
+            <div class="timeline-desc">Take I-75 across the Everglades — keep an eye out for gators along the canal. Quick, easy 2-hour drive.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">9:30 AM</div>
+            <div class="timeline-title">Arrive & Check In</div>
+            <div class="timeline-desc">Drop bags at your Airbnb in Naples or Marco Island. Get oriented and unload the trailer.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">10:30 AM</div>
+            <div class="timeline-title">🚤 Launch at Cocohatchee River Park</div>
+            <div class="timeline-desc">4 lanes, 60 trailer spots, courtesy docks — the best launch in the area. Ride out to the Gulf. Calm, warm waters with incredible visibility.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">1:00 PM</div>
+            <div class="timeline-title">Lunch on Marco Island</div>
+            <div class="timeline-desc">Fresh grouper sandwiches and cold beers at a waterfront spot. Walk the pristine white-sand beach after.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">2:30 PM</div>
+            <div class="timeline-title">🐚 Shelling on Marco Island</div>
+            <div class="timeline-desc">Tigertail Beach has some of the best shelling on the Gulf Coast. Find sand dollars, lightning whelks, and fighting conchs.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">4:30 PM</div>
+            <div class="timeline-title">🛶 Guided Mangrove Eco-Tour</div>
+            <div class="timeline-desc">Rising Tide Explorers offers biologist-led kayak tours through Marco's mangroves. Spot dolphins, manatees, and osprey nests.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">6:30 PM</div>
+            <div class="timeline-title">🌅 Sunset at Naples Pier</div>
+            <div class="timeline-desc">The iconic Naples Pier at golden hour — one of the best sunsets in Florida. Dolphins often play in the surf right at the pier.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">7:30 PM</div>
+            <div class="timeline-title">🍽️ Date Night Dinner</div>
+            <div class="timeline-desc">Naples has upscale dining — try a Gulf-to-table spot on Fifth Avenue South. Dress up a bit; it's worth it.</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Day 2 -->
+    <div class="glass-card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(234,179,8,0.12)">📅</div>
+          <div><h3>Day 2 — Sunday, March 22</h3><div class="card-subtitle">Rookery Bay, Ten Thousand Islands, head home</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-time">7:30 AM</div>
+            <div class="timeline-title">🛶 Rookery Bay Reserve</div>
+            <div class="timeline-desc">110,000 acres of pristine mangrove estuary. Launch early for glassy water and wildlife sightings — one of the most untouched ecosystems in Florida.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">10:00 AM</div>
+            <div class="timeline-title">Brunch in Naples</div>
+            <div class="timeline-desc">Fuel up at a café in the charming downtown Naples area. Açaí bowls, eggs Benedict, mimosas.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">11:30 AM</div>
+            <div class="timeline-title">🚤 Final Jet Ski Session</div>
+            <div class="timeline-desc">One more ride on the Gulf. Explore the Ten Thousand Islands if you're feeling adventurous — a maze of mangrove islands that feels like another planet.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">2:00 PM</div>
+            <div class="timeline-title">Pack Up & Drive Home</div>
+            <div class="timeline-desc">Back across Alligator Alley. Home by ~4:00 PM with plenty of time to rest up.</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Jet Ski Launches -->
+    <div class="glass-card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(251,146,60,0.12)">🚤</div>
+          <div><h3>Jet Ski Launch Ramps</h3><div class="card-subtitle">4 options in Naples / Marco area</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="location-grid">
+          <div class="location-item">
+            <div class="loc-icon">⭐</div>
+            <div class="loc-info">
+              <div class="loc-name">Cocohatchee River Park</div>
+              <div class="loc-detail">13535 Vanderbilt Dr. 4 lanes, 60 trailer spots, courtesy docks. Best ramp in the area.</div>
+              <span class="loc-tag tag-good">Best Option</span>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="loc-icon">🏙️</div>
+            <div class="loc-info">
+              <div class="loc-name">Naples Landing Park</div>
+              <div class="loc-detail">1101 9th St S. 3 lanes, 35 trailer spots. $5/hr parking — bring quarters or the app.</div>
+              <span class="loc-tag tag-info">$5/hr parking</span>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="loc-icon">🛶</div>
+            <div class="loc-info">
+              <div class="loc-name">Bayview Park</div>
+              <div class="loc-detail">2 lanes, 20 trailer spots. Also has a dedicated kayak launch — good combo spot.</div>
+              <span class="loc-tag tag-good">Kayak Launch Too</span>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="loc-icon">🚀</div>
+            <div class="loc-info">
+              <div class="loc-name">Collier Blvd Boating Park</div>
+              <div class="loc-detail">Double-wide lane, 80 trailer spots. Closest to Marco Island and the Ten Thousand Islands.</div>
+              <span class="loc-tag tag-info">80 Spots</span>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Kayaking -->
+    <div class="glass-card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(45,212,191,0.12)">🛶</div>
+          <div><h3>Kayaking Spots</h3><div class="card-subtitle">World-class paddling on the Gulf Coast</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="location-grid">
+          <div class="location-item">
+            <div class="loc-icon">🌿</div>
+            <div class="loc-info">
+              <div class="loc-name">Rookery Bay Reserve</div>
+              <div class="loc-detail">110,000 acres of pristine mangroves. One of the last undisturbed estuaries in the state. Incredible birdwatching.</div>
+              <span class="loc-tag tag-good">Must Do</span>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="loc-icon">🌳</div>
+            <div class="loc-info">
+              <div class="loc-name">Fakahatchee State Preserve — East River</div>
+              <div class="loc-detail">The most extensive mangrove tunnel system in the area. Feels like paddling through a cathedral of roots.</div>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="loc-icon">🐬</div>
+            <div class="loc-info">
+              <div class="loc-name">Marco Island Mangrove Eco-Tours</div>
+              <div class="loc-detail">Guided tours with dolphins and manatees. Rising Tide Explorers — led by marine biologists.</div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Airbnb -->
+    <div class="glass-card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(249,115,22,0.12)">🏡</div>
+          <div><h3>Book Your Stay</h3><div class="card-subtitle">Naples or Marco Island</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:14px;">Pre-filtered for 2 adults, March 21-23. Look for places near the water with trailer-friendly parking.</p>
+        <div class="links-row">
+          <a href="https://www.airbnb.com/s/Naples%2C%20Florida/homes?checkin=2026-03-21&checkout=2026-03-23&adults=2" target="_blank" class="link-btn" style="background:linear-gradient(135deg,#f97316,#eab308);border-color:transparent;color:#fff;">
+            <svg viewBox="0 0 24 24" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Search Naples Airbnbs
+          </a>
+          <a href="https://www.airbnb.com/s/Marco%20Island%2C%20Florida/homes?checkin=2026-03-21&checkout=2026-03-23&adults=2" target="_blank" class="link-btn">
+            <svg viewBox="0 0 24 24" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Search Marco Island
+          </a>
+          <a href="https://maps.google.com/?q=Naples+FL" target="_blank" class="link-btn">
+            <svg viewBox="0 0 24 24" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Google Maps
+          </a>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- ==================== STAY LOCAL ==================== -->
+  <div class="tab-content" id="tab-local">
+
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-icon">🚗</div><div class="stat-value">0 min</div><div class="stat-label">Drive Time</div></div>
+      <div class="stat-card"><div class="stat-icon">🌡️</div><div class="stat-value">79–81°F</div><div class="stat-label">Highs</div></div>
+      <div class="stat-card"><div class="stat-icon">🛏️</div><div class="stat-value">Home</div><div class="stat-label">Sleep In</div></div>
+      <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-value">~$200</div><div class="stat-label">Est. Total</div></div>
+    </div>
+
+    <div class="pro-con">
+      <span class="pro-tag">✓ No drive</span>
+      <span class="pro-tag">✓ No Airbnb cost</span>
+      <span class="pro-tag">✓ Sleep in your own bed</span>
+      <span class="con-tag">✗ Same routine</span>
+      <span class="con-tag">✗ Not a "getaway" feel</span>
+    </div>
+    <br>
+
+    <!-- Day 1 -->
+    <div class="glass-card open">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(139,92,246,0.12)">📅</div>
+          <div><h3>Day 1 — Saturday, March 21</h3><div class="card-subtitle">Intracoastal adventure + date night</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-time">9:00 AM</div>
+            <div class="timeline-title">Sleep In & Lazy Morning</div>
+            <div class="timeline-desc">No alarm, no packing. Make a great breakfast at home or hit up a local café.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">10:30 AM</div>
+            <div class="timeline-title">🚤 Jet Ski on the Intracoastal</div>
+            <div class="timeline-desc">Launch from Deerfield Beach or Hillsboro Inlet. Ride south past the mega-yachts, explore Hillsboro Inlet, or head north to the Boca sandbar.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">1:00 PM</div>
+            <div class="timeline-title">Lunch at the Beach</div>
+            <div class="timeline-desc">Grab fish tacos at Deerfield Beach or a nice lunch at JB's on the Beach. Feet in the sand.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">2:30 PM</div>
+            <div class="timeline-title">🛶 Kayak at Quiet Waters Park</div>
+            <div class="timeline-desc">Chill paddling on the lake. Bring a Bluetooth speaker. Or explore the Hillsboro Canal for more of an adventure.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">4:30 PM</div>
+            <div class="timeline-title">Clean Up & Get Ready</div>
+            <div class="timeline-desc">Head home, shower, and get dressed up for date night.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">7:00 PM</div>
+            <div class="timeline-title">🍽️ Date Night Dinner</div>
+            <div class="timeline-desc">Pick from the curated list below — La Nouvelle Maison for French romance, Abe & Louie's for steak, or Dear Olivia for something close to home.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">9:30 PM</div>
+            <div class="timeline-title">Nightcap & Home</div>
+            <div class="timeline-desc">Cocktails at a lounge in Boca, then home to your own bed. No checkout tomorrow!</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Day 2 -->
+    <div class="glass-card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(236,72,153,0.12)">📅</div>
+          <div><h3>Day 2 — Sunday, March 22</h3><div class="card-subtitle">Chill morning, one more water session</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-time">9:00 AM</div>
+            <div class="timeline-title">Brunch Out</div>
+            <div class="timeline-desc">Hit up a favorite spot in Boca or Coral Springs for a proper Sunday brunch.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">11:00 AM</div>
+            <div class="timeline-title">🚤 Morning Jet Ski or Kayak</div>
+            <div class="timeline-desc">One more session on the water while conditions are perfect. Intracoastal is usually calmer in the morning.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">1:30 PM</div>
+            <div class="timeline-title">Relax & Recharge</div>
+            <div class="timeline-desc">Pool time, read a book, catch up on a show. Or walk along the beach. Low-key Sunday vibes to close out the weekend.</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- Date Night Restaurants -->
+    <div class="glass-card open">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(244,114,182,0.12)">💕</div>
+          <div><h3>Date Night Restaurants</h3><div class="card-subtitle">Curated picks near Coconut Creek</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="resto-item"><div class="resto-icon">🇫🇷</div><div><div class="resto-name">La Nouvelle Maison</div><div class="resto-type">French · Boca Raton · Intimate, romantic, classic French cuisine</div></div></div>
+        <div class="resto-item"><div class="resto-icon">🇮🇹</div><div><div class="resto-name">Piccolino Italian Ristorante</div><div class="resto-type">Italian · Downtown Boca · Candlelit, old-world charm</div></div></div>
+        <div class="resto-item"><div class="resto-icon">🥩</div><div><div class="resto-name">Abe & Louie's</div><div class="resto-type">Steakhouse · Boca Raton · High-end, classic power-dinner vibe</div></div></div>
+        <div class="resto-item"><div class="resto-icon">🐟</div><div><div class="resto-name">City Fish Market</div><div class="resto-type">Seafood · Boca Raton · Waterfront, great raw bar</div></div></div>
+        <div class="resto-item"><div class="resto-icon">🍷</div><div><div class="resto-name">Dear Olivia</div><div class="resto-type">Modern American · Parkland · Close to home, trendy & delicious</div></div></div>
+        <div class="resto-item"><div class="resto-icon">🔥</div><div><div class="resto-name">Runyon's</div><div class="resto-type">Steakhouse · Coral Springs · Local landmark, no-fuss great steak</div></div></div>
+      </div></div>
+    </div>
+
+    <!-- Local Launches -->
+    <div class="glass-card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header-left">
+          <div class="icon-circle" style="background:rgba(139,92,246,0.12)">🚤</div>
+          <div><h3>Local Launch Points</h3><div class="card-subtitle">Jet ski & kayak spots near home</div></div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body"><div class="card-body-inner">
+        <div class="location-grid">
+          <div class="location-item">
+            <div class="loc-icon">🌊</div>
+            <div class="loc-info">
+              <div class="loc-name">Deerfield Beach — Intracoastal Ramp</div>
+              <div class="loc-detail">Quick access to the ICW. Ride south to Hillsboro Inlet or north to the Boca sandbars.</div>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="loc-icon">🏖️</div>
+            <div class="loc-info">
+              <div class="loc-name">Hillsboro Inlet</div>
+              <div class="loc-detail">Scenic inlet with the iconic Hillsboro Lighthouse. Great for jet skiing near the ocean.</div>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="loc-icon">🌿</div>
+            <div class="loc-info">
+              <div class="loc-name">Quiet Waters Park</div>
+              <div class="loc-detail">Calm lake paddling in Deerfield Beach. Kayak and paddleboard rentals available.</div>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="loc-icon">🛶</div>
+            <div class="loc-info">
+              <div class="loc-name">Hillsboro Canal</div>
+              <div class="loc-detail">For a longer paddle. Mangroves and wildlife — feels more remote than it is.</div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- ==================== SHARED SECTIONS ==================== -->
+
+  <!-- Cost Comparison -->
+  <div class="glass-card" style="margin-top:10px;">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left">
+        <div class="icon-circle" style="background:rgba(74,222,128,0.12)">💰</div>
+        <div><h3>Cost Comparison</h3><div class="card-subtitle">Estimated weekend budget breakdown</div></div>
+      </div>
+      <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="card-body"><div class="card-body-inner">
+      <div class="cost-grid">
+        <div class="cost-card">
+          <div class="cost-dest">🏝️ Islamorada</div>
+          <div class="cost-line"><span>Airbnb (1 night)</span><span>$180–250</span></div>
+          <div class="cost-line"><span>Gas (round trip)</span><span>$50–60</span></div>
+          <div class="cost-line"><span>Launch fees</span><span>$50</span></div>
+          <div class="cost-line"><span>Dining (2 days)</span><span>$150–200</span></div>
+          <div class="cost-line"><span>Activities</span><span>$50–100</span></div>
+          <div class="cost-total"><span>Total</span><span>$480–660</span></div>
+        </div>
+        <div class="cost-card">
+          <div class="cost-dest">🐚 Naples / Marco</div>
+          <div class="cost-line"><span>Airbnb (1 night)</span><span>$160–230</span></div>
+          <div class="cost-line"><span>Gas (round trip)</span><span>$40–50</span></div>
+          <div class="cost-line"><span>Launch fees</span><span>$10–20</span></div>
+          <div class="cost-line"><span>Dining (2 days)</span><span>$150–200</span></div>
+          <div class="cost-line"><span>Activities</span><span>$50–80</span></div>
+          <div class="cost-total"><span>Total</span><span>$410–580</span></div>
+        </div>
+        <div class="cost-card">
+          <div class="cost-dest">🏠 Stay Local</div>
+          <div class="cost-line"><span>Airbnb</span><span>$0</span></div>
+          <div class="cost-line"><span>Gas</span><span>$15–20</span></div>
+          <div class="cost-line"><span>Launch fees</span><span>$0–10</span></div>
+          <div class="cost-line"><span>Dining (date night)</span><span>$120–200</span></div>
+          <div class="cost-line"><span>Activities</span><span>$20–40</span></div>
+          <div class="cost-total"><span>Total</span><span>$155–270</span></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- Packing Checklist -->
+  <div class="glass-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left">
+        <div class="icon-circle" style="background:rgba(56,189,248,0.12)">🎒</div>
+        <div><h3>Packing Checklist</h3><div class="card-subtitle">Tap items to check them off</div></div>
+      </div>
+      <svg class="chevron" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="card-body"><div class="card-body-inner">
+      <div class="checklist">
+        <div class="check-category">
+          <h4>🚤 Jet Ski Gear</h4>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Jet ski key & lanyard</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Life jackets (2)</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Trailer hitch & lock</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Ratchet straps</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Trailer lights check</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Drain plug</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Gas can (backup)</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Registration & insurance</span></div>
+        </div>
+        <div class="check-category">
+          <h4>🛶 Kayak / Water</h4>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Kayak(s) or rental reservation</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Paddles</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Dry bag for phones</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Snorkel gear (optional)</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Water shoes</span></div>
+        </div>
+        <div class="check-category">
+          <h4>☀️ Sun & Safety</h4>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Reef-safe sunscreen (SPF 50+)</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Sunglasses (polarized)</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Hat / visor</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Rash guard / UV shirt</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Bug spray</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>First aid kit</span></div>
+        </div>
+        <div class="check-category">
+          <h4>👔 Clothes & Essentials</h4>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Swimsuits (2 each)</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Date night outfit</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Change of dry clothes</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Towels (beach + quick-dry)</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Phone charger / power bank</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Bluetooth speaker</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Cooler with drinks & snacks</span></div>
+          <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>Cash (for launch fees)</span></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- Branding -->
+  <div class="branding">
+    <div class="brand-logo"><span class="wave">〰️</span> OneWave AI</div>
+    <div>Built for Gabe & his wife's epic weekend. Have an amazing time! 🌴</div>
+  </div>
+
+</div>
+
+<script>
+  function switchTab(tabId) {
+    // Update buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+    // Update content
+    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+    document.getElementById(`tab-${tabId}`).classList.add('active');
+  }
+
+  function toggleCard(header) {
+    header.closest('.glass-card').classList.toggle('open');
+  }
+
+  function toggleCheck(item) {
+    item.classList.toggle('checked');
+    // Save state
+    saveChecklist();
+  }
+
+  // Persist checklist state in memory (no localStorage per policy)
+  const checklistState = {};
+  function saveChecklist() {
+    document.querySelectorAll('.check-item').forEach((item, i) => {
+      checklistState[i] = item.classList.contains('checked');
+    });
+  }
+
+  // Smooth entrance animations
+  document.addEventListener('DOMContentLoaded', () => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.glass-card, .stats-bar, .pro-con').forEach((el, i) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = `opacity 0.6s ease ${i * 0.08}s, transform 0.6s ease ${i * 0.08}s`;
+      observer.observe(el);
+    });
+  });
+</script>
+</body>
+</html>
